@@ -1,0 +1,24 @@
+version: '3.1'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: geogamr_user
+      POSTGRES_PASSWORD: geogamr_password
+      POSTGRES_DB: geogamr_db
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "9080:8080"
+  smtp4dev:
+    image: rnwood/smtp4dev:v3
+    restart: always
+    ports:
+      - "9081:80"
+      - "9025:25"

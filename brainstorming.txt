@@ -1,0 +1,3 @@
+poc de l'appli :
+Avoir une liste d'image en base de donnée qui correspond à des jeux (des screenshots de pleins de jeux).
+Lorsque j'accède sur l'appli je veux avoir une image, où je peux inscire le nom du jeu, et si c'est bon je gagne des points, et il y aurai par exemple un défilement de 10 images pour commencer.
