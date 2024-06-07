@@ -1,0 +1,177 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table games {
+  id integer [primary key]
+  name varchar
+  alternative_names integer[] [ref: > alternative_names.id] // Array of Alternative Name IDs
+  category integer [ref: > enum_game_category.id] // The category of this game
+  collection integer [ref: > collection.id] // The series the game belongs to
+  collections integer[] [ref: > collection.id] // Array of Collection IDs
+  first_release_date integer // Unix Time Stamp
+  franchise integer [ref: > franchise.id] // The main franchise
+  franchises integer[] [ref: > franchise.id] // Array of Franchise IDs
+  game_engines integer[] [ref: > game_engine.id] // Array of Game Engine IDs
+  game_modes integer[] [ref: > game_mode.id] // Array of Game Mode IDs
+  genres integer[] [ref: > genre.id] // Array of Genre IDs
+  involved_companies integer[] [ref: > involved_company.id] // Array of Involved Company IDs
+  keywords integer[] [ref: > keywords.id] // Array of Keyword IDs
+  parent_game integer [ref: > games.id] // If a DLC, expansion or part of a bundle
+  platforms integer[] [ref: > platform.id] // Array of Platform IDs
+  player_perspectives integer[] [ref: > player_perspectives.id] // Array of Player Perspective IDs
+  ports integer[] [ref: > games.id] // Array of Game IDs
+  screenshots integer[] [ref: > screenshots.id] // Array of Screenshot IDs
+  release_dates integer[] [ref: > release_date.id] // Array of Release Date IDs
+  remakes integer[] [ref: > games.id] // Array of Game IDs
+  remasters integer[] [ref: > games.id] // Array of Game IDs
+  similar_games integer[] [ref: > games.id] // Array of Game IDs
+  slug varchar // A url-safe, unique, lower-case version of the name
+  storyline text // A short description of a games story
+  summary text // A description of the game
+  tags integer[] [ref: > enum_tag.id] // Array of Tag Numbers
+  themes integer[] [ref: > theme.id] // Array of Theme IDs
+  total_rating double // Average rating based on both IGDB user and external critic scores
+  total_rating_count integer // Total number of user and external critic scores
+  updated_at timestamp // The last date this entry was updated in the IGDB database
+  url varchar // The website address (URL) of the item
+  version_parent integer [ref: > games.id] // If a version, this is the main game
+  version_title varchar // Title of this version (i.e Gold edition)
+}
+
+Table alternative_names {
+  id integer [primary key]
+  comment text // A description of what kind of alternative name it is
+  game integer [ref: > games.id] // The game this alternative name is associated with
+  name varchar // An alternative name
+}
+
+Table franchise {
+  id integer [primary key]
+  name varchar // The name of the franchise
+  slug varchar // A url-safe, unique, lower-case version of the name
+}
+
+Table game_engine {
+  id integer [primary key]
+  description text // Description of the game engine
+  name varchar // Name of the game engine
+  slug varchar // A url-safe, unique, lower-case version of the name
+}
+
+Table game_mode {
+  id integer [primary key]
+  name varchar // The name of the game mode
+  slug varchar // A url-safe, unique, lower-case version of the name
+}
+
+Table genre {
+  id integer [primary key]
+  name varchar // The name of the genre
+  slug varchar // A url-safe, unique, lower-case version of the name
+}
+
+Table involved_company {
+  id integer [primary key]
+  company integer [ref: > company.id] // Reference for company_id
+  developer boolean // Is developer
+  game integer [ref: > games.id] // Reference for game_id
+  porting boolean // Is porting
+  publisher boolean // Is publisher
+  supporting boolean // Is supporting
+}
+
+Table company {
+  id integer [primary key]
+  changed_company_id integer [ref: > company.id] // The new ID for a company that has gone through a merger or restructuring
+  country integer // ISO 3166-1 country code
+  description text // A free text description of a company
+  name varchar // The name of the company
+  parent integer [ref: > company.id] // A company with a controlling interest in a specific company
+  slug varchar // A url-safe, unique, lower-case version of the name
+  start_date integer // Unix Time Stamp
+  start_date_category integer // Start Date Category Enum
+  url varchar // The website address (URL) of the item
+  websites integer[] // The companies official websites
+}
+
+Table keywords {
+  id integer [primary key]
+  name varchar // Example: monsters
+  slug varchar // A url-safe, unique, lower-case version of the name
+}
+
+Table platform {
+  id integer [primary key]
+  abbreviation varchar // An abbreviation of the platform name
+  alternative_name varchar // An alternative name for the platform
+  category integer [ref: > enum_platform_category.id] // A physical or virtual category of the platform
+  generation integer // The generation of the platform
+  name varchar // The name of the platform
+  platform_family integer [ref: > platform_family.id] // The family of platforms this one belongs to
+  slug varchar // A url-safe, unique, lower-case version of the name
+  summary text // The summary of the first Version of this platform
+}
+
+Table platform_family {
+  id integer [primary key]
+  name varchar // Example: nintendo, xbox
+  slug varchar // A url-safe, unique, lower-case version of the name
+}
+
+Table player_perspectives {
+  id integer [primary key]
+  name varchar // The name of the player perspective
+  slug varchar // A url-safe, unique, lower-case version of the name
+}
+
+Table release_date {
+  id integer [primary key]
+  category integer // The format category of the release date
+  date timestamp // The date of the release
+  game integer [ref: > games.id] // The game associated with this release date
+  human varchar // A human readable representation of the date
+  m integer // The month as an integer starting at 1 (January)
+  platform integer [ref: > platform.id] // The platform of the release
+  y integer // The year in full (e.g., 2018)
+}
+
+Table screenshots {
+  id integer [primary key]
+  alpha_channel boolean // Does the image have an alpha channel
+  animated boolean // Is the image animated
+  game integer [ref: > games.id] // The game this screenshot is associated with
+  height integer // The height of the image in pixels
+  image_id varchar // The ID of the image used to construct an IGDB image link
+  url varchar // The website address (URL) of the item
+  width integer // The width of the image in pixels
+}
+
+Table theme {
+  id integer [primary key]
+  name varchar // The name of the theme
+  slug varchar // A url-safe, unique, lower-case version of the name
+}
+
+Table collection {
+  id integer [primary key]
+  as_child_relations integer[] [ref: > collection.id]
+  as_parent_relations integer[] [ref: > collection.id]
+  games integer[] [ref: > games.id]
+  name varchar
+  slug varchar
+}
+
+Table enum_platform_category {
+  id integer [primary key]
+  name varchar
+}
+
+Table enum_game_category {
+  id integer [primary key]
+  name varchar
+}
+
+Table enum_tag {
+  id integer [primary key]
+  name varchar
+}
