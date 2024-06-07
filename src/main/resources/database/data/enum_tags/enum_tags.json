@@ -1,0 +1,22 @@
+[
+    {
+        "id": 0,
+        "name": "Theme"
+    },
+    {
+        "id": 1,
+        "name": "Genre"
+    },
+    {
+        "id": 2,
+        "name": "Keyword"
+    },
+    {
+        "id": 3,
+        "name": "Game"
+    },
+    {
+        "id": 4,
+        "name": "Player Perspective"
+    }
+]

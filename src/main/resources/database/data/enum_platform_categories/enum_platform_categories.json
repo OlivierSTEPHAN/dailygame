@@ -1,0 +1,26 @@
+[
+    {
+        "id": 1,
+        "name": "console"
+    },
+    {
+        "id": 2,
+        "name": "arcade"
+    },
+    {
+        "id": 3,
+        "name": "platform"
+    },
+    {
+        "id": 4,
+        "name": "operating_system"
+    },
+    {
+        "id": 5,
+        "name": "portable_console"
+    },
+    {
+        "id": 6,
+        "name": "computer"
+    }
+]
