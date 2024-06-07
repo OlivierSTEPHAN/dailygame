@@ -1,6 +1,5 @@
 package com.zytoune.dailygame.configuration;
 
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zytoune.dailygame.entity.auth.Role;
@@ -22,6 +21,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -37,7 +40,7 @@ public class DataInitializer {
     private final CollectionsRepository collectionsRepository;
     private final CompaniesRepository companyRepository;
     private final EnumGameCategoriesRepository enumGameCategoriesRepository;
-    private  final EnumPlatformCategoriesRepository enumPlatformCategoriesRepository;
+    private final EnumPlatformCategoriesRepository enumPlatformCategoriesRepository;
     private final EnumTagRepository enumTagRepository;
     private final FranchisesRepository franchiseRepository;
     private final GameEnginesRepository gameEngineRepository;
@@ -53,13 +56,8 @@ public class DataInitializer {
     private final ScreenshotsRepository screenshotRepository;
     private final ThemesRepository themeRepository;
 
-
     private ObjectMapper objectMapper;
 
-    /**
-     * Initialisation des roles et des utilisateurs ADMIN et MANAGER
-     * @return void
-     */
     @Bean
     CommandLineRunner init() {
         return args -> {
@@ -93,43 +91,43 @@ public class DataInitializer {
                 log.info("Starting data import...");
 
                 log.info("Importing alternative names");
-                importDataIfEmpty(alternativeNameRepository, "alternative_names.json", new TypeReference<List<AlternativeNames>>() {});
+                importDataIfEmpty(alternativeNameRepository, "alternative_names", new TypeReference<List<AlternativeNames>>() {});
                 log.info("Importing collections");
-                importDataIfEmpty(collectionsRepository, "collections.json", new TypeReference<List<Collections>>() {});
+                importDataIfEmpty(collectionsRepository, "collections", new TypeReference<List<Collections>>() {});
                 log.info("Importing companies");
-                importDataIfEmpty(companyRepository, "companies.json", new TypeReference<List<Companies>>() {});
+                importDataIfEmpty(companyRepository, "companies", new TypeReference<List<Companies>>() {});
                 log.info("Importing enum game categories");
-                importDataIfEmpty(enumGameCategoriesRepository, "enum_game_categories.json", new TypeReference<List<EnumGameCategories>>() {});
+                importDataIfEmpty(enumGameCategoriesRepository, "enum_game_categories", new TypeReference<List<EnumGameCategories>>() {});
                 log.info("Importing enum platform categories");
-                importDataIfEmpty(enumPlatformCategoriesRepository, "enum_platform_categories.json", new TypeReference<List<EnumPlatformCategories>>() {});
+                importDataIfEmpty(enumPlatformCategoriesRepository, "enum_platform_categories", new TypeReference<List<EnumPlatformCategories>>() {});
                 log.info("Importing enum tags");
-                importDataIfEmpty(enumTagRepository, "enum_tags.json", new TypeReference<List<EnumTags>>() {});
+                importDataIfEmpty(enumTagRepository, "enum_tags", new TypeReference<List<EnumTags>>() {});
                 log.info("Importing franchises");
-                importDataIfEmpty(franchiseRepository, "franchises.json", new TypeReference<List<Franchises>>() {});
+                importDataIfEmpty(franchiseRepository, "franchises", new TypeReference<List<Franchises>>() {});
                 log.info("Importing game engines");
-                importDataIfEmpty(gameEngineRepository, "game_engines.json", new TypeReference<List<GameEngines>>() {});
+                importDataIfEmpty(gameEngineRepository, "game_engines", new TypeReference<List<GameEngines>>() {});
                 log.info("Importing game modes");
-                importDataIfEmpty(gameModeRepository, "game_modes.json", new TypeReference<List<GameModes>>() {});
+                importDataIfEmpty(gameModeRepository, "game_modes", new TypeReference<List<GameModes>>() {});
                 log.info("Importing games");
-                importDataIfEmpty(gameRepository, "games.json", new TypeReference<List<Games>>() {});
+                importDataIfEmpty(gameRepository, "games", new TypeReference<List<Games>>() {});
                 log.info("Importing genres");
-                importDataIfEmpty(genreRepository, "genres.json", new TypeReference<List<Genres>>() {});
+                importDataIfEmpty(genreRepository, "genres", new TypeReference<List<Genres>>() {});
                 log.info("Importing involved companies");
-                importDataIfEmpty(involvedCompanyRepository, "involved_companies.json", new TypeReference<List<InvolvedCompanies>>() {});
+                importDataIfEmpty(involvedCompanyRepository, "involved_companies", new TypeReference<List<InvolvedCompanies>>() {});
                 log.info("Importing keywords");
-                importDataIfEmpty(keywordRepository, "keywords.json", new TypeReference<List<Keywords>>() {});
+                importDataIfEmpty(keywordRepository, "keywords", new TypeReference<List<Keywords>>() {});
                 log.info("Importing platform families");
-                importDataIfEmpty(platformFamilyRepository, "platform_families.json", new TypeReference<List<PlatformFamilies>>() {});
+                importDataIfEmpty(platformFamilyRepository, "platform_families", new TypeReference<List<PlatformFamilies>>() {});
                 log.info("Importing platforms");
-                importDataIfEmpty(platformRepository, "platforms.json", new TypeReference<List<Platforms>>() {});
+                importDataIfEmpty(platformRepository, "platforms", new TypeReference<List<Platforms>>() {});
                 log.info("Importing player perspectives");
-                importDataIfEmpty(playerPerspectiveRepository, "player_perspectives.json", new TypeReference<List<PlayerPerspectives>>() {});
+                importDataIfEmpty(playerPerspectiveRepository, "player_perspectives", new TypeReference<List<PlayerPerspectives>>() {});
                 log.info("Importing release dates");
-                importDataIfEmpty(releaseDateRepository, "release_dates.json", new TypeReference<List<ReleaseDates>>() {});
+                importDataIfEmpty(releaseDateRepository, "release_dates", new TypeReference<List<ReleaseDates>>() {});
                 log.info("Importing screenshots");
-                importDataIfEmpty(screenshotRepository, "screenshots.json", new TypeReference<List<Screenshots>>() {});
+                importDataIfEmpty(screenshotRepository, "screenshots", new TypeReference<List<Screenshots>>() {});
                 log.info("Importing themes");
-                importDataIfEmpty(themeRepository, "themes.json", new TypeReference<List<Themes>>() {});
+                importDataIfEmpty(themeRepository, "themes", new TypeReference<List<Themes>>() {});
                 log.info("Data import completed.");
 
             } catch (Exception e) {
@@ -139,19 +137,31 @@ public class DataInitializer {
     }
 
     @Transactional
-    private <T> void importDataIfEmpty(JpaRepository<T, ?> repository, String fileName, TypeReference<List<T>> typeReference) {
+    private <T> void importDataIfEmpty(JpaRepository<T, ?> repository, String directoryName, TypeReference<List<T>> typeReference) {
         if (repository.count() == 0) {
-            try (InputStream inputStream = new ClassPathResource("database/data/" + fileName).getInputStream()) {
-                List<T> entities = objectMapper.readValue(inputStream, typeReference);
-                repository.saveAll(entities);
-                log.info("Imported {} records from {}", entities.size(), fileName);
+            try {
+                Path dirPath = Paths.get(new ClassPathResource("database/data/" + directoryName).getURI());
+                List<T> allEntities = new ArrayList<>();
+
+                Files.walk(dirPath)
+                        .filter(Files::isRegularFile)
+                        .forEach(filePath -> {
+                            try (InputStream inputStream = Files.newInputStream(filePath)) {
+                                List<T> entities = objectMapper.readValue(inputStream, typeReference);
+                                allEntities.addAll(entities);
+                            } catch (IOException e) {
+                                log.error("Error importing data from {}: ", filePath.getFileName(), e);
+                            }
+                        });
+
+                repository.saveAll(allEntities);
+                log.info("Imported {} records from {}", allEntities.size(), directoryName);
             } catch (IOException e) {
-                log.error("Error importing data from {}: ", fileName, e);
+                log.error("Error reading directory {}: ", directoryName, e);
             }
         } else {
-            log.info("Table for {} is not empty, skipping import.", fileName);
+            log.info("Table for {} is not empty, skipping import.", directoryName);
         }
     }
 
 }
-

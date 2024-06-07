@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.8'
 
 services:
   db:
@@ -7,18 +7,34 @@ services:
     ports:
       - "5433:5432"
     environment:
-      POSTGRES_USER: geogamr_user
-      POSTGRES_PASSWORD: geogamr_password
-      POSTGRES_DB: geogamr_db
+      POSTGRES_USER: dailygame_user
+      POSTGRES_PASSWORD: dailygame_password
+      POSTGRES_DB: dailygame_db
 
   adminer:
     image: adminer
     restart: always
     ports:
       - "9080:8080"
+
   smtp4dev:
     image: rnwood/smtp4dev:v3
     restart: always
     ports:
       - "9081:80"
       - "9025:25"
+
+  app:
+    build: .
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - smtp4dev
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/dailygame_db
+      SPRING_DATASOURCE_USERNAME: dailygame_user
+      SPRING_DATASOURCE_PASSWORD: dailygame_password
+      SPRING_MAIL_HOST: smtp4dev
+      SPRING_MAIL_PORT: 25
