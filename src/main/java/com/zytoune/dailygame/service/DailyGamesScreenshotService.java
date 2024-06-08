@@ -7,6 +7,7 @@ import com.zytoune.dailygame.repository.games.DailyGamesScreenshotsRepository;
 import io.micrometer.common.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -56,8 +57,20 @@ public class DailyGamesScreenshotService {
         return false;
     }
 
-    @Scheduled(cron = "0 */10 * * * *")
-    public void updateDailyGames(){
+    @Scheduled(cron = "0 */3 * * * *")
+    @Profile("dev")
+    public void updateDailyGamesDev() {
+        log.info("Updating daily game in dev mode");
+        updateDailyGames();
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    @Profile("prod")
+    public void updateDailyGamesProd() {
+        updateDailyGames();
+    }
+
+    private void updateDailyGames(){
         log.info("Updating daily games screenshots");
 
         if(this.gamesService.getNbrGames() == 0 || this.screenshotsService.count() == 0){

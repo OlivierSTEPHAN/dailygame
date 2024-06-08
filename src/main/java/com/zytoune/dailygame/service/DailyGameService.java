@@ -9,6 +9,7 @@ import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -35,39 +36,6 @@ public class DailyGameService {
     private GameModesService gameModesService;
     private GameEnginesService gameEnginesService;
 
-
-    @Scheduled(cron = "0 */3 * * * *")
-    public void updateDailyGames(){
-        log.info("-------------------");
-        log.info("Updating daily game");
-
-        if(this.gamesService.getNbrGames() == 0){
-            log.info("No games yet");
-            return;
-        }
-
-        if(this.dailyGameRepository.count() > 0){
-            this.dailyGameRepository.deleteAll();
-        }
-
-        Games game = this.gamesService.findNRandomGames(1).get(0);
-        DailyGame dailyGame = returnCompatibleGameOrElseNull(game);
-        while(dailyGame == null){
-            game = this.gamesService.findNRandomGames(1).get(0);
-            dailyGame = returnCompatibleGameOrElseNull(game);
-        }
-
-        this.dailyGameRepository.save(dailyGame);
-        log.info("-------------------");
-    }
-
-    private Integer getYearFromTimeStamp(Integer timestamp){
-        if(timestamp == null){
-            return null;
-        }
-        LocalDateTime date = LocalDateTime.ofEpochSecond(timestamp, 0, ZoneOffset.UTC);
-        return date.getYear();
-    }
 
     private DailyGame returnCompatibleGameOrElseNull(Games game){
         log.info("Daily game update : Checking game {}", game.getName());
@@ -169,4 +137,48 @@ public class DailyGameService {
     }
 
 
+    @Scheduled(cron = "0 */3 * * * *")
+    @Profile("dev")
+    public void updateDailyGamesDev() {
+        log.info("Updating daily game in dev mode");
+        updateDailyGames();
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    @Profile("prod")
+    public void updateDailyGamesProd() {
+        updateDailyGames();
+    }
+
+    private void updateDailyGames(){
+        log.info("-------------------");
+        log.info("Updating daily game");
+
+        if(this.gamesService.getNbrGames() == 0){
+            log.info("No games yet");
+            return;
+        }
+
+        if(this.dailyGameRepository.count() > 0){
+            this.dailyGameRepository.deleteAll();
+        }
+
+        Games game = this.gamesService.findNRandomGames(1).get(0);
+        DailyGame dailyGame = returnCompatibleGameOrElseNull(game);
+        while(dailyGame == null){
+            game = this.gamesService.findNRandomGames(1).get(0);
+            dailyGame = returnCompatibleGameOrElseNull(game);
+        }
+
+        this.dailyGameRepository.save(dailyGame);
+        log.info("-------------------");
+    }
+
+    private Integer getYearFromTimeStamp(Integer timestamp){
+        if(timestamp == null){
+            return null;
+        }
+        LocalDateTime date = LocalDateTime.ofEpochSecond(timestamp, 0, ZoneOffset.UTC);
+        return date.getYear();
+    }
 }
