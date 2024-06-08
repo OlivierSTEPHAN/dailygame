@@ -9,12 +9,11 @@ import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.annotation.ReadOnlyProperty;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -64,6 +63,7 @@ public class DailyGameService {
                 .platforms(platforms)
                 .gameModes(gameModes)
                 .gameEngines(gameEngines)
+                .creation(Timestamp.valueOf(LocalDateTime.now()))
                 .build();
     }
 
@@ -136,21 +136,7 @@ public class DailyGameService {
                 .build();
     }
 
-
-    @Scheduled(cron = "0 */3 * * * *")
-    @Profile("dev")
-    public void updateDailyGamesDev() {
-        log.info("Updating daily game in dev mode");
-        updateDailyGames();
-    }
-
-    @Scheduled(cron = "0 0 0 * * *")
-    @Profile("prod")
-    public void updateDailyGamesProd() {
-        updateDailyGames();
-    }
-
-    private void updateDailyGames(){
+    public void updateDailyGames(){
         log.info("-------------------");
         log.info("Updating daily game");
 

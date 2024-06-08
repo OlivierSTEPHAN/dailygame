@@ -9,6 +9,8 @@ import com.zytoune.dailygame.entity.games.*;
 import com.zytoune.dailygame.repository.auth.RoleRepository;
 import com.zytoune.dailygame.repository.auth.UserRepository;
 import com.zytoune.dailygame.repository.games.*;
+import com.zytoune.dailygame.service.DailyGameService;
+import com.zytoune.dailygame.service.DailyGamesScreenshotService;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,6 +57,9 @@ public class DataInitializer {
     private final ReleaseDatesRepository releaseDateRepository;
     private final ScreenshotsRepository screenshotRepository;
     private final ThemesRepository themeRepository;
+
+    private DailyGameService dailyGameService;
+    private DailyGamesScreenshotService dailyGamesScreenshotService;
 
     private ObjectMapper objectMapper;
 
@@ -130,6 +135,9 @@ public class DataInitializer {
                 importDataIfEmpty(themeRepository, "themes", new TypeReference<List<Themes>>() {});
                 log.info("Data import completed.");
 
+                // Initialisation des jeux du jour
+                dailyGameService.updateDailyGames();
+                dailyGamesScreenshotService.updateDailyGames();
             } catch (Exception e) {
                 log.error("Error while reading json files: {}", e.getMessage());
             }

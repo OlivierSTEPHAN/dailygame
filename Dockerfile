@@ -11,4 +11,4 @@ COPY target/dailygame-0.0.1-SNAPSHOT.jar /app/app.jar
 EXPOSE 8080
 
 # Commande pour démarrer ton application Spring Boot
-CMD ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}", "app.jar"]

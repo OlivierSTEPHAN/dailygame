@@ -57,20 +57,7 @@ public class DailyGamesScreenshotService {
         return false;
     }
 
-    @Scheduled(cron = "0 */3 * * * *")
-    @Profile("dev")
-    public void updateDailyGamesDev() {
-        log.info("Updating daily game in dev mode");
-        updateDailyGames();
-    }
-
-    @Scheduled(cron = "0 0 0 * * *")
-    @Profile("prod")
-    public void updateDailyGamesProd() {
-        updateDailyGames();
-    }
-
-    private void updateDailyGames(){
+    public void updateDailyGames(){
         log.info("Updating daily games screenshots");
 
         if(this.gamesService.getNbrGames() == 0 || this.screenshotsService.count() == 0){

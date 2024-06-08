@@ -3,6 +3,7 @@ package com.zytoune.dailygame.entity.games;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Getter
@@ -27,4 +28,5 @@ public class DailyGame {
     private int year;
     private List<String> gameModes;
     private List<String> gameEngines;
+    private Timestamp creation;
 }
