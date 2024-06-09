@@ -49,6 +49,7 @@ public class DailyGamesScreenshotService {
         if(dailyGame.getName().equalsIgnoreCase(answer)){
             return true;
         }
+
         for(String alternativeName : dailyGame.getAlternativeNames()){
             if(alternativeName.equalsIgnoreCase(answer)){
                 return true;

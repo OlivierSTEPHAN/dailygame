@@ -29,9 +29,6 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfigurationApplication {
 
-    private final JwtFilter jwtFilter;
-    private final BCryptPasswordEncoder passwordEncoder;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
@@ -43,20 +40,11 @@ public class SecurityConfigurationApplication {
                                 .requestMatchers(HttpMethod.POST, "/daily-games/*").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/games").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/games/*").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/user/register").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/user/activate").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/user/login").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/user/refresh-token").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/user/update-password").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/user/new-password").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/avis").hasAnyRole("ADMIN", "MANAGER")
-                                .requestMatchers(HttpMethod.GET, "/user/users").hasAnyRole("ADMIN", "MANAGER")
                                 .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
+    /*
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -70,17 +58,6 @@ public class SecurityConfigurationApplication {
         return source;
     }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
+     */
 
-    @Bean
-    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService){
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
-
-        return  daoAuthenticationProvider;
-    }
 }

@@ -2,12 +2,7 @@ package com.zytoune.dailygame.configuration;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zytoune.dailygame.entity.auth.Role;
-import com.zytoune.dailygame.entity.auth.RoleEnum;
-import com.zytoune.dailygame.entity.User;
 import com.zytoune.dailygame.entity.games.*;
-import com.zytoune.dailygame.repository.auth.RoleRepository;
-import com.zytoune.dailygame.repository.auth.UserRepository;
 import com.zytoune.dailygame.repository.games.*;
 import com.zytoune.dailygame.service.DailyGameService;
 import com.zytoune.dailygame.service.DailyGamesScreenshotService;
@@ -18,7 +13,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -33,10 +27,6 @@ import java.util.List;
 @Slf4j
 @Component
 public class DataInitializer {
-
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final RoleRepository roleRepository;
 
     private final AlternativeNamesRepository alternativeNameRepository;
     private final CollectionsRepository collectionsRepository;
@@ -66,32 +56,6 @@ public class DataInitializer {
     @Bean
     CommandLineRunner init() {
         return args -> {
-            if (roleRepository.findByLibelle(RoleEnum.USER) == null) {
-                Role userRole = new Role();
-                userRole.setLibelle(RoleEnum.USER);
-                roleRepository.save(userRole);
-            }
-
-            if (roleRepository.findByLibelle(RoleEnum.ADMIN) == null) {
-                Role adminRole = new Role();
-                adminRole.setLibelle(RoleEnum.ADMIN);
-                roleRepository.save(adminRole);
-            }
-
-            if (roleRepository.findByLibelle(RoleEnum.MANAGER) == null) {
-                Role managerRole = new Role();
-                managerRole.setLibelle(RoleEnum.MANAGER);
-                roleRepository.save(managerRole);
-            }
-
-            if(userRepository.findByUsername("admin").isEmpty() || userRepository.findByUsername("manager").isEmpty()){
-                User admin = User.builder().active(true).username("admin").password(passwordEncoder.encode("admin")).email("admin@mail.fr").role(roleRepository.findByLibelle(RoleEnum.ADMIN)).build();
-                this.userRepository.save(admin);
-
-                User manager = User.builder().active(true).username("manager").password(passwordEncoder.encode("manager")).email("manager@mail.fr").role(roleRepository.findByLibelle(RoleEnum.MANAGER)).build();
-                this.userRepository.save(manager);
-            }
-
             try {
                 log.info("Starting data import...");
 

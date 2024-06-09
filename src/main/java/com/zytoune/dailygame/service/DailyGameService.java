@@ -36,19 +36,19 @@ public class DailyGameService {
     private GameEnginesService gameEnginesService;
 
 
-    private DailyGame returnCompatibleGameOrElseNull(Games game){
+    protected DailyGame returnCompatibleGameOrElseNull(Games game){
         log.info("Daily game update : Checking game {}", game.getName());
-        String name = game.getName();
-        List<String> alternativeNames = this.alternativeNamesService.getAlternativeNamesFromAlternativeNamesId(game.getAlternativeNames());
-        List<String> genres = this.genresService.getGenresByGenreIds(game.getGenres());
-        List<String> pov = this.playerPerspectivesService.getPlayerPerspectivesByIds(game.getPlayerPerspectives());
-        List<String> franchises = this.franchisesService.getFranchisesByIds(game.getFranchises());
-        List<String> companies = this.companiesService.getCompaniesByIds(game.getInvolvedCompanies());
-        Integer year = this.getYearFromTimeStamp(game.getFirstReleaseDate());
-        List<String> platforms = this.platformsService.getPlatformsByIds(game.getPlatforms());
-        List<String> gameModes = this.gameModesService.getGameModesByIds(game.getGameModes());
-        List<String> gameEngines = this.gameEnginesService.getGameEngineById(game.getGameEngines());
-        if(StringUtils.isBlank(name) || CollectionUtils.isEmpty(alternativeNames) || CollectionUtils.isEmpty(genres) || CollectionUtils.isEmpty(pov) || CollectionUtils.isEmpty(companies) || year == null || CollectionUtils.isEmpty(platforms) || CollectionUtils.isEmpty(gameModes) || CollectionUtils.isEmpty(gameEngines)){
+        String name = game.getName(); // Mandatory
+        List<String> alternativeNames = this.alternativeNamesService.getAlternativeNamesFromAlternativeNamesId(game.getAlternativeNames()); // Not mandatory
+        List<String> genres = this.genresService.getGenresByGenreIds(game.getGenres()); // Mandatory
+        List<String> pov = this.playerPerspectivesService.getPlayerPerspectivesByIds(game.getPlayerPerspectives()); // Mandatory
+        List<String> franchises = this.franchisesService.getFranchisesByIds(game.getFranchises()); // Not mandatory
+        List<String> companies = this.companiesService.getCompaniesByIds(game.getInvolvedCompanies()); // Mandatory
+        Integer year = this.getYearFromTimeStamp(game.getFirstReleaseDate()); // Mandatory
+        List<String> platforms = this.platformsService.getPlatformsByIds(game.getPlatforms()); // Mandatory
+        List<String> gameModes = this.gameModesService.getGameModesByIds(game.getGameModes()); // Mandatory
+        List<String> gameEngines = this.gameEnginesService.getGameEngineById(game.getGameEngines()); // Not mandatory
+        if(StringUtils.isBlank(name) || CollectionUtils.isEmpty(alternativeNames) || CollectionUtils.isEmpty(genres) || CollectionUtils.isEmpty(pov) || CollectionUtils.isEmpty(companies) || year == null || CollectionUtils.isEmpty(platforms) || CollectionUtils.isEmpty(gameModes)){
             return null;
         }
         log.info("Daily game update : Game {} is valid", game.getName());
@@ -112,7 +112,8 @@ public class DailyGameService {
 
         return this.mappingGameToDTO(gameToCheck);
     }
-    private DailyGameDTO mappingGameToDTO(Games game){
+
+    protected DailyGameDTO mappingGameToDTO(Games game){
         String name = game.getName();
         List<String> genres = this.genresService.getGenresByGenreIds(game.getGenres());
         List<String> pov = this.playerPerspectivesService.getPlayerPerspectivesByIds(game.getPlayerPerspectives());

@@ -18,7 +18,7 @@ public class DailygameProdJob {
     private DailyGamesScreenshotService dailyGamesScreenshotService;
 
     @Scheduled(cron = "0 0 0 * * *")
-    public void updateDailyGamesDev() {
+    public void updateDailyGamesProd() {
         log.info("Updating daily game in prod mode");
         dailyGameService.updateDailyGames();
         dailyGamesScreenshotService.updateDailyGames();

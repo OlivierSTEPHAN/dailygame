@@ -25,9 +25,11 @@ public class ApplicationControllerAdvice {
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(value = Exception.class)
-    public Map<String, String> exceptionsHandler(Exception exception){
+    public ProblemDetail exceptionsHandler(Exception exception){
         log.error(exception.getMessage(), exception);
-        return Map.of("erreur", exception.getMessage());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Accès refusé");
+        problemDetail.setProperty("erreur", exception.getMessage());
+        return problemDetail;
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
@@ -44,24 +46,6 @@ public class ApplicationControllerAdvice {
     public @ResponseBody ProblemDetail runtimeException(Exception exception){
         log.error(exception.getMessage(), exception);
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Erreur interne : " + exception.getMessage());
-        problemDetail.setProperty("erreur", exception.getMessage());
-        return problemDetail;
-    }
-
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(value = BadCredentialsException.class)
-    public @ResponseBody ProblemDetail badCredentialsException(Exception exception){
-        log.error(exception.getMessage(), exception);
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Erreur d'authentification");
-        problemDetail.setProperty("erreur", exception.getMessage());
-        return problemDetail;
-    }
-
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(value = {MalformedJwtException.class, SignatureException.class, JwtException.class, ExpiredJwtException.class})
-    public @ResponseBody ProblemDetail jtwException(Exception exception){
-        log.error(exception.getMessage(), exception);
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, "Token invalide");
         problemDetail.setProperty("erreur", exception.getMessage());
         return problemDetail;
     }

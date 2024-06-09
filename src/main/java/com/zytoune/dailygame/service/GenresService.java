@@ -20,6 +20,4 @@ public class GenresService {
         }
         return genresRepository.findAllById(ids).stream().map(Genres::getName).toList();
     }
-
-
 }
