@@ -1,14 +1,15 @@
 package com.zytoune.dailygame.service;
 
+import com.zytoune.dailygame.dto.DailyGamesScreenshotsUrlDTO;
 import com.zytoune.dailygame.dto.DailyGamesScreenshotsDTO;
 import com.zytoune.dailygame.entity.games.DailyGamesScreenshot;
 import com.zytoune.dailygame.entity.games.Games;
+import com.zytoune.dailygame.model.ImageType;
 import com.zytoune.dailygame.repository.games.DailyGamesScreenshotsRepository;
+import com.zytoune.dailygame.util.GameComparaturUtil;
 import io.micrometer.common.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -24,6 +25,19 @@ public class DailyGamesScreenshotService {
     private GamesService gamesService;
     private ScreenshotsService screenshotsService;
     private AlternativeNamesService alternativeNamesService;
+    private FranchisesService franchisesService;
+
+    public DailyGamesScreenshotsUrlDTO getDailyGamesUrl() {
+        List<DailyGamesScreenshot> dailyGameScreenshots = dailyGamesScreenshotsRepository.findAll();
+        if(dailyGameScreenshots.isEmpty()){
+            throw new RuntimeException("No daily games found");
+        }
+
+        return DailyGamesScreenshotsUrlDTO.builder()
+                .screenshots(dailyGameScreenshots.stream().map(DailyGamesScreenshot::getScreenshot).toList())
+                .build();
+    }
+
 
     public DailyGamesScreenshotsDTO getDailyGames() {
         List<DailyGamesScreenshot> dailyGameScreenshots = dailyGamesScreenshotsRepository.findAll();
@@ -32,7 +46,8 @@ public class DailyGamesScreenshotService {
         }
 
         return DailyGamesScreenshotsDTO.builder()
-                .screenshots(dailyGameScreenshots.stream().map(DailyGamesScreenshot::getScreenshot).toList())
+                .name(dailyGameScreenshots.stream().map(DailyGamesScreenshot::getName).toList())
+                .url(dailyGameScreenshots.stream().map(DailyGamesScreenshot::getScreenshot).toList())
                 .build();
     }
 
@@ -46,15 +61,25 @@ public class DailyGamesScreenshotService {
 
         DailyGamesScreenshot dailyGame = dailyGameScreenshots.get(index);
 
-        if(dailyGame.getName().equalsIgnoreCase(answer)){
+        // Vérif par le nom du jeu
+        if(GameComparaturUtil.compareGameNames(dailyGame.getName(), answer)){
             return true;
         }
 
+        // Vérif par les noms alternatifs
         for(String alternativeName : dailyGame.getAlternativeNames()){
-            if(alternativeName.equalsIgnoreCase(answer)){
+            if(GameComparaturUtil.compareGameNames(alternativeName, answer)){
                 return true;
             }
         }
+
+        // Vérif par les franchises
+        for(String franchise : dailyGame.getFranchises()){
+            if(GameComparaturUtil.compareGameNames(franchise, answer)){
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -78,11 +103,15 @@ public class DailyGamesScreenshotService {
             DailyGamesScreenshot dailyGamesScreenshot = DailyGamesScreenshot.builder()
                     .name(game.getName())
                     .alternativeNames(this.alternativeNamesService.getAlternativeNamesFromAlternativeNamesId(game.getAlternativeNames()))
-                    .screenshot(this.screenshotsService.generateUrl(this.screenshotsService.getScreenshotsById(game.getScreenshots().get(rand.nextInt(game.getScreenshots().size()))).getImageId())).
-                    build();
+                    .screenshot(this.screenshotsService.generateUrl(
+                            this.screenshotsService.getScreenshotsById(game.getScreenshots().get(rand.nextInt(game.getScreenshots().size()))).getImageId()
+                            , ImageType.P1080)
+                    ).franchises(franchisesService.getFranchisesByIds(game.getFranchises()))
+                    .build();
 
             this.dailyGamesScreenshotsRepository.save(dailyGamesScreenshot);
             log.info("Daily game {} : {} added", i, dailyGamesScreenshot.getName() + " " + dailyGamesScreenshot.getScreenshot());
         }
     }
+
 }

@@ -1,6 +1,7 @@
 package com.zytoune.dailygame.service;
 
 import com.zytoune.dailygame.entity.games.Screenshots;
+import com.zytoune.dailygame.model.ImageType;
 import com.zytoune.dailygame.repository.games.ScreenshotsRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,11 +58,21 @@ class ScreenshotsServiceTest {
     }
 
     @Test
-    void shouldGenerateUrlForImageId() {
+    void shouldGenerateUrlForImageId1080P() {
         String imageId = "abc123";
         String expectedUrl = "https://images.igdb.com/igdb/image/upload/t_1080p/" + imageId + ".jpg";
 
-        String result = screenshotsService.generateUrl(imageId);
+        String result = screenshotsService.generateUrl(imageId, ImageType.P1080);
+
+        assertEquals(expectedUrl, result);
+    }
+
+    @Test
+    void shouldGenerateUrlForImageId720P() {
+        String imageId = "abc123";
+        String expectedUrl = "https://images.igdb.com/igdb/image/upload/t_720p/" + imageId + ".jpg";
+
+        String result = screenshotsService.generateUrl(imageId, ImageType.P720);
 
         assertEquals(expectedUrl, result);
     }

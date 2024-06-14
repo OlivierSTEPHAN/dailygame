@@ -21,5 +21,6 @@ public class DailyGamesScreenshot {
     private String name;
     private List<String> alternativeNames;
     private String screenshot;
+    private List<String> franchises;
 
 }

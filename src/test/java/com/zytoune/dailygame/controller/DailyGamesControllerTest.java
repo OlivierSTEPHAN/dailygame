@@ -1,9 +1,6 @@
 package com.zytoune.dailygame.controller;
 
-import com.zytoune.dailygame.dto.DailyGameAnswerDTO;
-import com.zytoune.dailygame.dto.DailyGameDTO;
-import com.zytoune.dailygame.dto.DailyGameScreenshotAnswerDTO;
-import com.zytoune.dailygame.dto.DailyGamesScreenshotsDTO;
+import com.zytoune.dailygame.dto.*;
 import com.zytoune.dailygame.service.DailyGameService;
 import com.zytoune.dailygame.service.DailyGamesScreenshotService;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +38,17 @@ class DailyGamesControllerTest {
 
         assertEquals(200, responseEntity.getStatusCodeValue());
         assertEquals(dailyGamesScreenshotsDTO, responseEntity.getBody());
+    }
+
+    @Test
+    void shouldReturnDailyGamesScreenshotsUrl() {
+        DailyGamesScreenshotsUrlDTO dailyGamesScreenshotsUrlDTO = new DailyGamesScreenshotsUrlDTO();
+        when(dailyGamesScreenshotsService.getDailyGamesUrl()).thenReturn(dailyGamesScreenshotsUrlDTO);
+
+        ResponseEntity<DailyGamesScreenshotsUrlDTO> responseEntity = dailyGamesController.getDailyGamesScreenshotsUrl();
+
+        assertEquals(200, responseEntity.getStatusCodeValue());
+        assertEquals(dailyGamesScreenshotsUrlDTO, responseEntity.getBody());
     }
 
     @Test

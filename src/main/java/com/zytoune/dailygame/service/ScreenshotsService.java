@@ -21,7 +21,7 @@ public class ScreenshotsService {
         return this.screenshotsRepository.count();
     }
 
-    public String generateUrl(String imageId){
-        return "https://images.igdb.com/igdb/image/upload/t_" + ImageType.P1080.getName() + "/" + imageId + ".jpg";
+    public String generateUrl(String imageId, ImageType imageType){
+        return "https://images.igdb.com/igdb/image/upload/t_" + imageType.getName() + "/" + imageId + ".jpg";
     }
 }

@@ -9,7 +9,6 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DailyGamesScreenshotsDTO {
-    private List<String> name;
-    private List<String> url;
+public class DailyGamesScreenshotsUrlDTO {
+    private List<String> screenshots;
 }

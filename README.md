@@ -25,7 +25,7 @@ docker-compose --env-file .env.dev up --build -d
 #### Production Mode
 Run the docker-compose file in production mode:
 ``
-docker-compose --env-file .env.dev up --build -d
+docker-compose --env-file .env.prod up --build -d
 ``
 
 ### Stopping Docker Compose
@@ -62,6 +62,12 @@ nano .env.dev // nano .env.prod
 5. **Run the Docker Compose File**
 ``
 docker-compose --env-file .env.dev up --build -d
+``
+
+## Updating the Docker Image
+
+``
+docker service update --image zytoune29/dailygames:latest dailygame_app
 ``
 
 ## Checking Logs

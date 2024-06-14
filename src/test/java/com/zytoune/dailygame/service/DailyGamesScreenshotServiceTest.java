@@ -1,6 +1,6 @@
 package com.zytoune.dailygame.service;
 
-import com.zytoune.dailygame.dto.DailyGamesScreenshotsDTO;
+import com.zytoune.dailygame.dto.DailyGamesScreenshotsUrlDTO;
 import com.zytoune.dailygame.entity.games.DailyGamesScreenshot;
 import com.zytoune.dailygame.entity.games.Games;
 import com.zytoune.dailygame.entity.games.Screenshots;
@@ -31,6 +31,9 @@ class DailyGamesScreenshotServiceTest {
     @Mock
     private AlternativeNamesService alternativeNamesService;
 
+    @Mock
+    private FranchisesService franchisesService;
+
     @InjectMocks
     private DailyGamesScreenshotService dailyGamesScreenshotService;
 
@@ -44,7 +47,7 @@ class DailyGamesScreenshotServiceTest {
         List<DailyGamesScreenshot> dailyGamesScreenshots = Arrays.asList(new DailyGamesScreenshot(), new DailyGamesScreenshot());
         when(dailyGamesScreenshotsRepository.findAll()).thenReturn(dailyGamesScreenshots);
 
-        DailyGamesScreenshotsDTO result = dailyGamesScreenshotService.getDailyGames();
+        DailyGamesScreenshotsUrlDTO result = dailyGamesScreenshotService.getDailyGamesUrl();
 
         assertEquals(2, result.getScreenshots().size());
     }
@@ -53,22 +56,41 @@ class DailyGamesScreenshotServiceTest {
     void shouldThrowExceptionWhenNoDailyGames() {
         when(dailyGamesScreenshotsRepository.findAll()).thenReturn(List.of());
 
-        assertThrows(RuntimeException.class, () -> dailyGamesScreenshotService.getDailyGames());
+        assertThrows(RuntimeException.class, () -> dailyGamesScreenshotService.getDailyGamesUrl());
     }
 
     @Test
     void shouldReturnTrueWhenAnswerIsCorrectByName() {
         DailyGamesScreenshot dailyGamesScreenshot1 = new DailyGamesScreenshot();
-        dailyGamesScreenshot1.setName("correct answer");
-        dailyGamesScreenshot1.setAlternativeNames(Arrays.asList("alternative name"));
+        dailyGamesScreenshot1.setName("Pokémon Legends: Arceus");
+        dailyGamesScreenshot1.setAlternativeNames(List.of("alternative name"));
+        dailyGamesScreenshot1.setFranchises(List.of("franchise"));
         DailyGamesScreenshot dailyGamesScreenshot2 = new DailyGamesScreenshot();
-        dailyGamesScreenshot2.setName("correct answer");
-        dailyGamesScreenshot2.setAlternativeNames(Arrays.asList("alternative name again"));
+        dailyGamesScreenshot2.setName("Alone in the dark");
+        dailyGamesScreenshot2.setAlternativeNames(List.of("alternative name again"));
 
         List<DailyGamesScreenshot> dailyGamesScreenshots = Arrays.asList(dailyGamesScreenshot1, dailyGamesScreenshot2);
         when(dailyGamesScreenshotsRepository.findAll()).thenReturn(dailyGamesScreenshots);
 
-        Boolean result = dailyGamesScreenshotService.checkDailyGame(0, "correct answer");
+        Boolean result = dailyGamesScreenshotService.checkDailyGame(0, "Pokémon Legends: Arceus");
+
+        assertTrue(result);
+    }
+
+    @Test
+    void shouldReturnTrueWhenAnswerIsCorrectByFranchise() {
+        DailyGamesScreenshot dailyGamesScreenshot1 = new DailyGamesScreenshot();
+        dailyGamesScreenshot1.setName("FIFA Soccer 07");
+        dailyGamesScreenshot1.setAlternativeNames(List.of("FIFA Football 07"));
+        dailyGamesScreenshot1.setFranchises(List.of("FIFA"));
+        DailyGamesScreenshot dailyGamesScreenshot2 = new DailyGamesScreenshot();
+        dailyGamesScreenshot2.setName("Alone in the dark");
+        dailyGamesScreenshot2.setAlternativeNames(List.of("alternative name again"));
+
+        List<DailyGamesScreenshot> dailyGamesScreenshots = Arrays.asList(dailyGamesScreenshot1, dailyGamesScreenshot2);
+        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(dailyGamesScreenshots);
+
+        Boolean result = dailyGamesScreenshotService.checkDailyGame(0, "FIFA Soccer 08");
 
         assertTrue(result);
     }
@@ -77,10 +99,10 @@ class DailyGamesScreenshotServiceTest {
     void shouldReturnTrueWhenAnswerIsCorrectByAlternativeNames() {
         DailyGamesScreenshot dailyGamesScreenshot1 = new DailyGamesScreenshot();
         dailyGamesScreenshot1.setName("wrong answer");
-        dailyGamesScreenshot1.setAlternativeNames(Arrays.asList("correct answer"));
+        dailyGamesScreenshot1.setAlternativeNames(List.of("correct answer"));
         DailyGamesScreenshot dailyGamesScreenshot2 = new DailyGamesScreenshot();
         dailyGamesScreenshot2.setName("wrong answer");
-        dailyGamesScreenshot2.setAlternativeNames(Arrays.asList("wrong answer"));
+        dailyGamesScreenshot2.setAlternativeNames(List.of("wrong answer"));
 
         List<DailyGamesScreenshot> dailyGamesScreenshots = Arrays.asList(dailyGamesScreenshot1, dailyGamesScreenshot2);
         when(dailyGamesScreenshotsRepository.findAll()).thenReturn(dailyGamesScreenshots);
@@ -94,14 +116,34 @@ class DailyGamesScreenshotServiceTest {
     void shouldReturnFalseWhenAnswerIsIncorrect() {
         DailyGamesScreenshot dailyGamesScreenshot1 = new DailyGamesScreenshot();
         dailyGamesScreenshot1.setName("correct answer");
-        dailyGamesScreenshot1.setAlternativeNames(Arrays.asList("alternative name"));
+        dailyGamesScreenshot1.setAlternativeNames(List.of("alternative name"));
+        dailyGamesScreenshot1.setFranchises(List.of("franchise"));
         DailyGamesScreenshot dailyGamesScreenshot2 = new DailyGamesScreenshot();
         dailyGamesScreenshot2.setName("wrong answer");
-        dailyGamesScreenshot1.setAlternativeNames(Arrays.asList("different alternative name"));
+        dailyGamesScreenshot1.setAlternativeNames(List.of("different alternative name"));
+        dailyGamesScreenshot1.setFranchises(List.of());
         List<DailyGamesScreenshot> dailyGamesScreenshots = Arrays.asList(dailyGamesScreenshot1, dailyGamesScreenshot2);
         when(dailyGamesScreenshotsRepository.findAll()).thenReturn(dailyGamesScreenshots);
 
         Boolean result = dailyGamesScreenshotService.checkDailyGame(0, "wrong answer");
+
+        assertFalse(result);
+    }
+
+    @Test
+    void shouldReturnFalseWhenAnswerIsEmpty() {
+        DailyGamesScreenshot dailyGamesScreenshot1 = new DailyGamesScreenshot();
+        dailyGamesScreenshot1.setName("correct answer");
+        dailyGamesScreenshot1.setAlternativeNames(List.of("alternative name"));
+        dailyGamesScreenshot1.setFranchises(List.of("franchise"));
+        DailyGamesScreenshot dailyGamesScreenshot2 = new DailyGamesScreenshot();
+        dailyGamesScreenshot2.setName("wrong answer");
+        dailyGamesScreenshot1.setAlternativeNames(List.of("different alternative name"));
+        dailyGamesScreenshot1.setFranchises(List.of(""));
+        List<DailyGamesScreenshot> dailyGamesScreenshots = Arrays.asList(dailyGamesScreenshot1, dailyGamesScreenshot2);
+        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(dailyGamesScreenshots);
+
+        Boolean result = dailyGamesScreenshotService.checkDailyGame(0, "");
 
         assertFalse(result);
     }
@@ -124,8 +166,8 @@ class DailyGamesScreenshotServiceTest {
         Screenshots screenshot = new Screenshots();
         screenshot.setImageId("imageId");
         when(screenshotsService.getScreenshotsById(anyInt())).thenReturn(screenshot);
-        when(screenshotsService.generateUrl(anyString())).thenReturn("url");
-        when(alternativeNamesService.getAlternativeNamesFromAlternativeNamesId(anyList())).thenReturn(Arrays.asList("Alternative Name"));
+        when(screenshotsService.generateUrl(anyString(), any())).thenReturn("url");
+        when(alternativeNamesService.getAlternativeNamesFromAlternativeNamesId(anyList())).thenReturn(List.of("Alternative Name"));
 
         dailyGamesScreenshotService.updateDailyGames();
 
@@ -161,11 +203,11 @@ class DailyGamesScreenshotServiceTest {
         Games game2 = new Games();
         game2.setName("Game");
         game2.setScreenshots(Arrays.asList(1, 2, 3));
-        when(gamesService.findNRandomGames(1)).thenReturn(Arrays.asList(game1), Arrays.asList(game2));
+        when(gamesService.findNRandomGames(1)).thenReturn(List.of(game1), List.of(game2));
         Screenshots screenshot = new Screenshots();
         screenshot.setImageId("imageId");
         when(screenshotsService.getScreenshotsById(anyInt())).thenReturn(screenshot);
-        when(screenshotsService.generateUrl(anyString())).thenReturn("url");
+        when(screenshotsService.generateUrl(anyString(), any())).thenReturn("url");
         when(alternativeNamesService.getAlternativeNamesFromAlternativeNamesId(anyList())).thenReturn(Arrays.asList("Alternative Name"));
 
         dailyGamesScreenshotService.updateDailyGames();

@@ -1,9 +1,6 @@
 package com.zytoune.dailygame.controller;
 
-import com.zytoune.dailygame.dto.DailyGameAnswerDTO;
-import com.zytoune.dailygame.dto.DailyGameDTO;
-import com.zytoune.dailygame.dto.DailyGameScreenshotAnswerDTO;
-import com.zytoune.dailygame.dto.DailyGamesScreenshotsDTO;
+import com.zytoune.dailygame.dto.*;
 import com.zytoune.dailygame.service.DailyGameService;
 import com.zytoune.dailygame.service.DailyGamesScreenshotService;
 import lombok.AllArgsConstructor;
@@ -21,15 +18,19 @@ public class DailyGamesController {
     private DailyGameService dailyGameService;
 
 
+    @GetMapping("/screenshots/url")
+    public ResponseEntity<DailyGamesScreenshotsUrlDTO> getDailyGamesScreenshotsUrl() {
+        return ResponseEntity.ok(dailyGamesScreenshotsService.getDailyGamesUrl());
+    }
+
     @GetMapping("/screenshots")
     public ResponseEntity<DailyGamesScreenshotsDTO> getDailyGamesScreenshots() {
-        log.info("Getting daily games screenshot");
         return ResponseEntity.ok(dailyGamesScreenshotsService.getDailyGames());
     }
 
     @PostMapping("/screenshots")
     public ResponseEntity<Boolean> isDailyGameScreenshotOk(@RequestBody DailyGameScreenshotAnswerDTO dailyGameAnswer) {
-        log.info("Checking daily games {}", dailyGameAnswer);
+        log.info("Checking daily games {} - {}", dailyGameAnswer.getIndex(), dailyGameAnswer.getAnswer());
         return ResponseEntity.ok(dailyGamesScreenshotsService.checkDailyGame(dailyGameAnswer.getIndex(), dailyGameAnswer.getAnswer().trim()));
     }
 
@@ -41,7 +42,7 @@ public class DailyGamesController {
 
     @PostMapping("/characteristics")
     public ResponseEntity<DailyGameDTO> isDailyGameOk(@RequestBody DailyGameAnswerDTO dailyGameAnswer) {
-        log.info("Checking daily games {}", dailyGameAnswer);
+        log.info("Checking daily games {}", dailyGameAnswer.getAnswer());
         return ResponseEntity.ok(dailyGameService.checkAnswer(dailyGameAnswer.getAnswer().trim()));
     }
 }

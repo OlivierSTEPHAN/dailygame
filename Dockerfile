@@ -1,14 +1,15 @@
-# Utilise une image de base avec Java 17
+# Use a base image with Java 17
 FROM openjdk:17-oracle
 
-# Définis le répertoire de travail dans le conteneur
+# Define the working directory inside the container
 WORKDIR /app
 
-# Copie le JAR de ton application dans le conteneur
+# Copy the JAR file and the keystore into the container
 COPY target/dailygame-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY src/main/resources/keystore.jks /app/keystore.jks
 
-# Expose le port sur lequel ton application Spring Boot écoute
-EXPOSE 8080
+# Expose the HTTPS port
+EXPOSE 8443
 
-# Commande pour démarrer ton application Spring Boot
+# Command to start your Spring Boot application with the active profile
 CMD ["java", "-jar", "-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}", "app.jar"]
