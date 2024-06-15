@@ -150,10 +150,10 @@ public class DailyGameService {
             this.dailyGameRepository.deleteAll();
         }
 
-        Games game = this.gamesService.findNRandomGames(1).get(0);
+        Games game = this.gamesService.findNRandomGames(1, 150).get(0);
         DailyGame dailyGame = returnCompatibleGameOrElseNull(game);
         while(dailyGame == null){
-            game = this.gamesService.findNRandomGames(1).get(0);
+            game = this.gamesService.findNRandomGames(1, 150).get(0);
             dailyGame = returnCompatibleGameOrElseNull(game);
         }
 

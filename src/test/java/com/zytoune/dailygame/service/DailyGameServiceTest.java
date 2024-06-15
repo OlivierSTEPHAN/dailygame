@@ -136,7 +136,7 @@ class DailyGameServiceTest {
 
         verify(dailyGameRepository, never()).deleteAll();
         verify(dailyGameRepository, never()).save(any());
-        verify(gamesService, never()).findNRandomGames(anyInt());
+        verify(gamesService, never()).findNRandomGames(anyInt(), anyInt());
     }
 
     @Test
@@ -145,7 +145,7 @@ class DailyGameServiceTest {
         when(dailyGameRepository.count()).thenReturn(1L);
 
         Games game = mock(Games.class);
-        when(gamesService.findNRandomGames(1)).thenReturn(List.of(game));
+        when(gamesService.findNRandomGames(anyInt(), anyInt())).thenReturn(List.of(game));
         DailyGame dailyGame = mock(DailyGame.class);
         when(dailyGameService.returnCompatibleGameOrElseNull(game)).thenReturn(dailyGame);
 
@@ -161,7 +161,7 @@ class DailyGameServiceTest {
         when(dailyGameRepository.count()).thenReturn(1L);
 
         Games game = mock(Games.class);
-        when(gamesService.findNRandomGames(1)).thenReturn(List.of(game));
+        when(gamesService.findNRandomGames(anyInt(), anyInt())).thenReturn(List.of(game));
         DailyGame dailyGame = mock(DailyGame.class);
         doReturn(dailyGame).when(dailyGameService).returnCompatibleGameOrElseNull(game);
 
@@ -178,7 +178,7 @@ class DailyGameServiceTest {
 
         Games game1 = mock(Games.class);
         Games game2 = mock(Games.class);
-        when(gamesService.findNRandomGames(1)).thenReturn(List.of(game1)).thenReturn(List.of(game2));
+        when(gamesService.findNRandomGames(anyInt(), anyInt())).thenReturn(List.of(game1)).thenReturn(List.of(game2));
 
         when(dailyGameService.returnCompatibleGameOrElseNull(game1)).thenReturn(null);
         DailyGame dailyGame = mock(DailyGame.class);
@@ -187,7 +187,7 @@ class DailyGameServiceTest {
 
         verify(dailyGameRepository, times(1)).deleteAll();
         verify(dailyGameRepository, times(1)).save(dailyGame);
-        verify(gamesService, times(2)).findNRandomGames(1);
+        verify(gamesService, times(2)).findNRandomGames(1, 150);
     }
 
 

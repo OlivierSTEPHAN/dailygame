@@ -16,7 +16,7 @@ public class GamesService {
     private final GamesRepository gamesRepository;
 
     public List<Games> getNRandomGames(int n){
-        return this.gamesRepository.findNRandomGames(n);
+        return this.gamesRepository.findNRandomGames(n, 50);
     }
 
     public List<String> findGameNames(String query) {
@@ -28,8 +28,8 @@ public class GamesService {
         return (int) this.gamesRepository.count();
     }
 
-    public List<Games> findNRandomGames(int n) {
-        return this.gamesRepository.findNRandomGames(n);
+    public List<Games> findNRandomGames(int n, int ratingCount) {
+        return this.gamesRepository.findNRandomGames(n, ratingCount);
     }
 
     public Games findGameByGameName(String gameName) {

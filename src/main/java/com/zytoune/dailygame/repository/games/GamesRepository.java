@@ -9,8 +9,8 @@ import java.util.Optional;
 
 public interface GamesRepository extends JpaRepository<Games, Integer> {
 
-    @Query(value = "SELECT * FROM t_games WHERE t_games.total_rating_count > 50  AND LOWER(name) NOT LIKE '%collector%' AND category NOT IN (1, 2, 3, 5, 6, 7, 12, 13, 14) ORDER BY RANDOM() LIMIT ?1", nativeQuery = true)
-    List<Games> findNRandomGames(int n);
+    @Query(value = "SELECT * FROM t_games WHERE t_games.total_rating_count > :ratingCount AND LOWER(name) NOT LIKE '%collector%' AND category NOT IN (1, 2, 3, 5, 6, 7, 12, 13, 14) ORDER BY RANDOM() LIMIT :n", nativeQuery = true)
+    List<Games> findNRandomGames(int n, int ratingCount);
 
     @Query(value = "SELECT name FROM t_games WHERE LOWER(name) LIKE LOWER(CONCAT('%', :query, '%')) AND LOWER(name) NOT LIKE '%collector%' AND category NOT IN (1, 2, 3, 5, 6, 7, 12, 13, 14) ORDER BY total_rating_count DESC LIMIT 50", nativeQuery = true)
     List<String> findByNameContainingIgnoreCase(String query);

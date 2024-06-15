@@ -93,12 +93,12 @@ public class DailyGamesScreenshotService {
 
         this.dailyGamesScreenshotsRepository.deleteAll();
         for (int i = 0; i < 10; i++) {
-            Games game = this.gamesService.findNRandomGames(1).get(0);
+            Games game = this.gamesService.findNRandomGames(1, 75).get(0);
             log.info("Game {} : {}", i, game.getName() + " " + game.getScreenshots());
             Random rand = new Random();
             while(StringUtils.isBlank(game.getName()) || CollectionUtils.isEmpty(game.getScreenshots()) || screenshotsService.getScreenshotsById(game.getScreenshots().get(rand.nextInt(game.getScreenshots().size()))) == null){
                 log.info("Game {} is not valid", game.getName() + " " + game.getScreenshots());
-                game = this.gamesService.findNRandomGames(1).get(0);
+                game = this.gamesService.findNRandomGames(1, 75).get(0);
             }
             DailyGamesScreenshot dailyGamesScreenshot = DailyGamesScreenshot.builder()
                     .name(game.getName())

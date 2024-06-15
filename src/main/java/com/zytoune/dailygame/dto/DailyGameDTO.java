@@ -18,7 +18,7 @@ public class DailyGameDTO {
     private List<String> franchises;
     private List<String> companiesName;
     private List<String> platforms;
-    private int year;
+    private Integer year;
     private List<String> gameModes;
     private List<String> gameEngines;
 }

@@ -35,7 +35,7 @@ class GamesServiceTest {
     @Test
     void shouldReturnNRandomGames() {
         Games game = mock(Games.class);
-        when(gamesRepository.findNRandomGames(anyInt())).thenReturn(Arrays.asList(game, game, game));
+        when(gamesRepository.findNRandomGames(anyInt(), anyInt())).thenReturn(Arrays.asList(game, game, game));
 
         List<Games> result = gamesService.getNRandomGames(3);
 
@@ -84,9 +84,9 @@ class GamesServiceTest {
     @Test
     void shouldReturnNRandomGamesWhenNIsPositive() {
         Games game = mock(Games.class);
-        when(gamesRepository.findNRandomGames(3)).thenReturn(Arrays.asList(game, game, game));
+        when(gamesRepository.findNRandomGames(anyInt(), anyInt())).thenReturn(Arrays.asList(game, game, game));
 
-        List<Games> result = gamesService.findNRandomGames(3);
+        List<Games> result = gamesService.findNRandomGames(3, 150);
 
         assertNotNull(result);
         assertEquals(3, result.size());
@@ -94,9 +94,9 @@ class GamesServiceTest {
 
     @Test
     void shouldReturnEmptyListWhenNIsZero() {
-        when(gamesRepository.findNRandomGames(0)).thenReturn(Collections.emptyList());
+        when(gamesRepository.findNRandomGames(anyInt(), anyInt())).thenReturn(Collections.emptyList());
 
-        List<Games> result = gamesService.findNRandomGames(0);
+        List<Games> result = gamesService.findNRandomGames(0, 0);
 
         assertNotNull(result);
         assertTrue(result.isEmpty());

@@ -177,7 +177,7 @@ class DailyGamesScreenshotServiceTest {
         Games game = new Games();
         game.setName("Game");
         game.setScreenshots(Arrays.asList(1, 2, 3));
-        when(gamesService.findNRandomGames(1)).thenReturn(Arrays.asList(game));
+        when(gamesService.findNRandomGames(anyInt(), anyInt())).thenReturn(Arrays.asList(game));
         Screenshots screenshot = new Screenshots();
         screenshot.setImageId("imageId");
         when(screenshotsService.getScreenshotsById(anyInt())).thenReturn(screenshot);
@@ -218,7 +218,7 @@ class DailyGamesScreenshotServiceTest {
         Games game2 = new Games();
         game2.setName("Game");
         game2.setScreenshots(Arrays.asList(1, 2, 3));
-        when(gamesService.findNRandomGames(1)).thenReturn(List.of(game1), List.of(game2));
+        when(gamesService.findNRandomGames(anyInt(), anyInt())).thenReturn(List.of(game1), List.of(game2));
         Screenshots screenshot = new Screenshots();
         screenshot.setImageId("imageId");
         when(screenshotsService.getScreenshotsById(anyInt())).thenReturn(screenshot);
