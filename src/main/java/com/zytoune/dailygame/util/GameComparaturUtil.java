@@ -19,6 +19,10 @@ public class GameComparaturUtil {
         String cleanName1 = normalized1.replaceAll("[^a-zA-Z0-9]", "").trim();
         String cleanName2 = normalized2.replaceAll("[^a-zA-Z0-9]", "").trim();
 
+        if(cleanName1.isEmpty() || cleanName2.isEmpty()) {
+            return false;
+        }
+
         if(cleanName2.contains(cleanName1) || cleanName1.contains(cleanName2)) {
             return true;
         }

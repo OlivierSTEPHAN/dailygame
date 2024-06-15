@@ -113,6 +113,21 @@ class DailyGamesScreenshotServiceTest {
     }
 
     @Test
+    void shouldReturnFalse() {
+        DailyGamesScreenshot dailyGamesScreenshot1 = new DailyGamesScreenshot();
+        dailyGamesScreenshot1.setName("Brothers in Arms: Hell's Highway");
+        dailyGamesScreenshot1.setAlternativeNames(List.of("브라더스 인 암즈 헬즈 하이웨이"));
+        dailyGamesScreenshot1.setFranchises(List.of());
+
+        List<DailyGamesScreenshot> dailyGamesScreenshots = Arrays.asList(dailyGamesScreenshot1);
+        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(dailyGamesScreenshots);
+
+        Boolean result = dailyGamesScreenshotService.checkDailyGame(0, "Fallout: Brotherhood of Steel 2");
+
+        assertFalse(result);
+    }
+
+    @Test
     void shouldReturnFalseWhenAnswerIsIncorrect() {
         DailyGamesScreenshot dailyGamesScreenshot1 = new DailyGamesScreenshot();
         dailyGamesScreenshot1.setName("correct answer");

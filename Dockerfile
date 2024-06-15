@@ -6,7 +6,6 @@ WORKDIR /app
 
 # Copy the JAR file and the keystore into the container
 COPY target/dailygame-0.0.1-SNAPSHOT.jar /app/app.jar
-COPY src/main/resources/keystore.jks /app/keystore.jks
 
 # Expose the HTTPS port
 EXPOSE 8443
