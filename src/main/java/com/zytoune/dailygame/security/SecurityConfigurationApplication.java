@@ -30,6 +30,7 @@ public class SecurityConfigurationApplication {
                 .authorizeHttpRequests(
                         authorize -> authorize
                                 .requestMatchers(HttpMethod.GET, "/daily-games/screenshots/*").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/daily-games/characteristics/*").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/daily-games/*").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/daily-games/*").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/games").permitAll()
