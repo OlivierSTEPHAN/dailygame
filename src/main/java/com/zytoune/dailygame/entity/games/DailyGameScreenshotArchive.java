@@ -8,20 +8,18 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
-@Table(name = "t_daily_games_screenshot")
-public class DailyGamesScreenshot {
-   
+@Table(name = "t_daily_game_screenshot_archive")
+public class DailyGameScreenshotArchive {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    private int date;
     private String name;
-    private List<String> alternativeNames;
     private String screenshot;
-    private List<String> franchises;
-    private List<Integer> scores;
 
+    @ElementCollection
+    private List<Integer> scores;
 }

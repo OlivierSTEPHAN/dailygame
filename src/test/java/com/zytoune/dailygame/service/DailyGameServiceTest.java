@@ -2,8 +2,10 @@ package com.zytoune.dailygame.service;
 
 import com.zytoune.dailygame.dto.DailyGameDTO;
 import com.zytoune.dailygame.entity.games.DailyGame;
+import com.zytoune.dailygame.entity.games.DailyGameArchive;
 import com.zytoune.dailygame.entity.games.Games;
 import com.zytoune.dailygame.exception.NoGameFoundException;
+import com.zytoune.dailygame.repository.games.DailyGameArchiveRepository;
 import com.zytoune.dailygame.repository.games.DailyGameRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import org.mockito.Spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +32,8 @@ class DailyGameServiceTest {
     private static final Logger log = LoggerFactory.getLogger(DailyGameServiceTest.class);
     @Mock
     private DailyGameRepository dailyGameRepository;
-
+    @Mock
+    private DailyGameArchiveRepository dailyGameArchiveRepository;
     @Mock
     private GamesService gamesService;
     @Mock
@@ -129,65 +133,66 @@ class DailyGameServiceTest {
     }
 
     @Test
-    void shouldNotUpdateDailyGamesWhenNoGamesExist() {
+    void updatingDailyGamesWithNoGamesDoesNotProceed() {
         when(gamesService.getNbrGames()).thenReturn(0L);
 
         dailyGameService.updateDailyGames();
 
-        verify(dailyGameRepository, never()).deleteAll();
-        verify(dailyGameRepository, never()).save(any());
-        verify(gamesService, never()).findNRandomGames(anyInt(), anyInt());
+        verify(dailyGameRepository, never()).findAll();
+        verify(dailyGameArchiveRepository, never()).save(any(DailyGameArchive.class));
+        verify(dailyGameRepository, never()).save(any(DailyGame.class));
     }
 
     @Test
-    void shouldUpdateDailyGamesWhenExistingDailyGamesPresent() {
+    void updatingDailyGamesArchivesExistingDailyGame() {
         when(gamesService.getNbrGames()).thenReturn(1L);
         when(dailyGameRepository.count()).thenReturn(1L);
+        List<DailyGame> existingDailyGames = List.of(new DailyGame());
+        when(dailyGameRepository.findAll()).thenReturn(existingDailyGames);
 
-        Games game = mock(Games.class);
-        when(gamesService.findNRandomGames(anyInt(), anyInt())).thenReturn(List.of(game));
-        DailyGame dailyGame = mock(DailyGame.class);
-        when(dailyGameService.returnCompatibleGameOrElseNull(game)).thenReturn(dailyGame);
+        Games newGame = new Games();
+        when(gamesService.findNRandomGames(1, 150)).thenReturn(List.of(newGame));
+        when(dailyGameService.returnCompatibleGameOrElseNull(newGame)).thenReturn(new DailyGame());
 
         dailyGameService.updateDailyGames();
 
+        verify(dailyGameArchiveRepository, times(1)).save(any(DailyGameArchive.class));
         verify(dailyGameRepository, times(1)).deleteAll();
-        verify(dailyGameRepository, times(1)).save(dailyGame);
     }
 
     @Test
-    void shouldUpdateDailyGamesWhenFirstGameIsCompatible() {
+    void updatingDailyGamesSavesNewDailyGameWhenFound() {
         when(gamesService.getNbrGames()).thenReturn(1L);
-        when(dailyGameRepository.count()).thenReturn(1L);
+        when(dailyGameRepository.count()).thenReturn(0L); // No existing daily games
 
-        Games game = mock(Games.class);
-        when(gamesService.findNRandomGames(anyInt(), anyInt())).thenReturn(List.of(game));
-        DailyGame dailyGame = mock(DailyGame.class);
-        doReturn(dailyGame).when(dailyGameService).returnCompatibleGameOrElseNull(game);
+        Games game = new Games();
+        when(gamesService.findNRandomGames(1, 150)).thenReturn(List.of(game));
+        DailyGame compatibleGame = new DailyGame();
+        when(dailyGameService.returnCompatibleGameOrElseNull(game)).thenReturn(compatibleGame);
 
         dailyGameService.updateDailyGames();
 
-        verify(dailyGameRepository, times(1)).deleteAll();
-        verify(dailyGameRepository, times(1)).save(dailyGame);
+        verify(dailyGameRepository, times(1)).save(compatibleGame);
     }
 
     @Test
-    void shouldUpdateDailyGamesWhenFirstGameIsNotCompatibleButSubsequentOneIs() {
-        when(gamesService.getNbrGames()).thenReturn(2L);
-        when(dailyGameRepository.count()).thenReturn(1L);
+    void updatingDailyGamesRetriesFindingNewGameUntilCompatibleOneIsFound() {
+        when(gamesService.getNbrGames()).thenReturn(1L);
+        when(dailyGameRepository.count()).thenReturn(0L); // No existing daily games
 
-        Games game1 = mock(Games.class);
-        Games game2 = mock(Games.class);
-        when(gamesService.findNRandomGames(anyInt(), anyInt())).thenReturn(List.of(game1)).thenReturn(List.of(game2));
+        Games incompatibleGame = new Games();
+        Games compatibleGame = new Games();
+        when(gamesService.findNRandomGames(1, 150))
+                .thenReturn(List.of(incompatibleGame)) // First call returns incompatible game
+                .thenReturn(List.of(compatibleGame)); // Second call returns compatible game
 
-        when(dailyGameService.returnCompatibleGameOrElseNull(game1)).thenReturn(null);
-        DailyGame dailyGame = mock(DailyGame.class);
-        doReturn(dailyGame).when(dailyGameService).returnCompatibleGameOrElseNull(game2);
+        when(dailyGameService.returnCompatibleGameOrElseNull(incompatibleGame)).thenReturn(null); // Incompatible
+        when(dailyGameService.returnCompatibleGameOrElseNull(compatibleGame)).thenReturn(new DailyGame()); // Compatible
+
         dailyGameService.updateDailyGames();
 
-        verify(dailyGameRepository, times(1)).deleteAll();
-        verify(dailyGameRepository, times(1)).save(dailyGame);
-        verify(gamesService, times(2)).findNRandomGames(1, 150);
+        verify(gamesService, times(2)).findNRandomGames(1, 150); // Ensure method was called twice
+        verify(dailyGameRepository, times(1)).save(any(DailyGame.class)); // Ensure a daily game was saved
     }
 
 
@@ -252,7 +257,7 @@ class DailyGameServiceTest {
         assertEquals("gameName", result.getName());
         assertEquals(Arrays.asList("genre1", "genre2"), result.getGenres());
         assertEquals(Arrays.asList("pov1", "pov2"), result.getPov());
-        assertEquals(Arrays.asList("gameName"), result.getFranchises());
+        assertEquals(List.of("gameName"), result.getFranchises());
         assertEquals(Arrays.asList("company1", "company2"), result.getCompaniesName());
         assertEquals(2000, result.getYear());
         assertEquals(Arrays.asList("platform1", "platform2"), result.getPlatforms());
@@ -314,5 +319,54 @@ class DailyGameServiceTest {
         DailyGame result = dailyGameService.returnCompatibleGameOrElseNull(game);
 
         assertNull(result);
+    }
+
+    @Test
+    void addingScoreToExistingDailyGameIncreasesScoreList() {
+        List<DailyGame> existingDailyGames = List.of(new DailyGame());
+        existingDailyGames.get(0).setScores(new ArrayList<>(List.of(10, 20)));
+        when(dailyGameRepository.findAll()).thenReturn(existingDailyGames);
+
+        dailyGameService.addScore(30);
+
+        assertEquals(3, existingDailyGames.get(0).getScores().size());
+        assertTrue(existingDailyGames.get(0).getScores().contains(30));
+        verify(dailyGameRepository, times(1)).save(any(DailyGame.class));
+    }
+
+    @Test
+    void addingScoreThrowsExceptionWhenNoDailyGamesFound() {
+        when(dailyGameRepository.findAll()).thenReturn(Collections.emptyList());
+
+        assertThrows(RuntimeException.class, () -> dailyGameService.addScore(10));
+    }
+
+    @Test
+    void getScoreReturnsAverageScoreForDailyGame() {
+        List<DailyGame> existingDailyGames = List.of(new DailyGame());
+        existingDailyGames.get(0).setScores(new ArrayList<>(List.of(10, 20, 30)));
+        when(dailyGameRepository.findAll()).thenReturn(existingDailyGames);
+
+        int averageScore = dailyGameService.getScore();
+
+        assertEquals(20, averageScore);
+    }
+
+    @Test
+    void getScoreReturnsZeroWhenNoScoresPresent() {
+        List<DailyGame> existingDailyGames = List.of(new DailyGame());
+        existingDailyGames.get(0).setScores(new ArrayList<>());
+        when(dailyGameRepository.findAll()).thenReturn(existingDailyGames);
+
+        int averageScore = dailyGameService.getScore();
+
+        assertEquals(0, averageScore);
+    }
+
+    @Test
+    void getScoreThrowsExceptionWhenNoDailyGamesFound() {
+        when(dailyGameRepository.findAll()).thenReturn(Collections.emptyList());
+
+        assertThrows(RuntimeException.class, () -> dailyGameService.getScore());
     }
 }

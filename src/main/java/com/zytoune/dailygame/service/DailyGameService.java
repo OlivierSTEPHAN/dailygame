@@ -2,8 +2,10 @@ package com.zytoune.dailygame.service;
 
 import com.zytoune.dailygame.dto.DailyGameDTO;
 import com.zytoune.dailygame.entity.games.DailyGame;
+import com.zytoune.dailygame.entity.games.DailyGameArchive;
 import com.zytoune.dailygame.entity.games.Games;
 import com.zytoune.dailygame.exception.NoGameFoundException;
+import com.zytoune.dailygame.repository.games.DailyGameArchiveRepository;
 import com.zytoune.dailygame.repository.games.DailyGameRepository;
 import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
@@ -16,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Slf4j
@@ -24,6 +27,7 @@ import java.util.List;
 public class DailyGameService {
 
     private DailyGameRepository dailyGameRepository;
+    private DailyGameArchiveRepository dailyGameArchiveRepository;
 
     private GamesService gamesService;
     private AlternativeNamesService alternativeNamesService;
@@ -137,6 +141,28 @@ public class DailyGameService {
                 .build();
     }
 
+    public void addScore(int score){
+        List<DailyGame> dailyGames = this.dailyGameRepository.findAll();
+        if(CollectionUtils.isEmpty(dailyGames)){
+            throw new RuntimeException("No daily games found");
+        }
+
+        DailyGame dailyGame = dailyGames.get(0);
+        dailyGame.getScores().add(score);
+        this.dailyGameRepository.save(dailyGame);
+    }
+
+    public int getScore(){
+        List<DailyGame> dailyGames = this.dailyGameRepository.findAll();
+        if(CollectionUtils.isEmpty(dailyGames)){
+            throw new RuntimeException("No daily games found");
+        }
+
+        DailyGame dailyGame = dailyGames.get(0);
+
+        return (int) dailyGame.getScores().stream().mapToInt(Integer::intValue).average().orElse(0);
+    }
+
     public void updateDailyGames(){
         log.info("-------------------");
         log.info("Updating daily game");
@@ -147,6 +173,17 @@ public class DailyGameService {
         }
 
         if(this.dailyGameRepository.count() > 0){
+            List<DailyGame> dailyGames = this.dailyGameRepository.findAll();
+
+            int currentDate = Integer.parseInt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyy")));
+            DailyGame dailyGame = dailyGames.get(0);
+            DailyGameArchive dailyGameArchive = DailyGameArchive.builder()
+                    .id(currentDate)
+                    .name(dailyGame.getName())
+                    .scores(dailyGame.getScores())
+                    .build();
+
+            this.dailyGameArchiveRepository.save(dailyGameArchive);
             this.dailyGameRepository.deleteAll();
         }
 

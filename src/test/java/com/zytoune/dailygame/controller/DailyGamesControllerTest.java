@@ -8,10 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class DailyGamesControllerTest {
 
@@ -85,5 +89,83 @@ class DailyGamesControllerTest {
 
         assertEquals(200, responseEntity.getStatusCodeValue());
         assertEquals(dailyGameDTO, responseEntity.getBody());
+    }
+
+    @Test
+    void addingScreenshotScoreUpdatesSuccessfully() {
+        List<Integer> scoresToAdd = List.of(10, 20, 30);
+        DailyGamesScreenshotScoreDTO dailyGamesScore = new DailyGamesScreenshotScoreDTO();
+        dailyGamesScore.setDailyGamesScore(scoresToAdd);
+
+        ResponseEntity<Boolean> response = dailyGamesController.isDailyGameScreenshotScoreOk(dailyGamesScore);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody());
+        verify(dailyGamesScreenshotsService, times(1)).addScore(scoresToAdd);
+    }
+
+    @Test
+    void getScreenshotScoresReturnsCorrectScores() {
+        List<Integer> expectedScores = List.of(10, 20, 30);
+        when(dailyGamesScreenshotsService.getScore()).thenReturn(expectedScores);
+
+        ResponseEntity<List<Integer>> response = dailyGamesController.getDailyGamesScreenshotScore();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedScores, response.getBody());
+    }
+
+    @Test
+    void addingScreenshotScoreWithEmptyListReturnsTrue() {
+        List<Integer> scoresToAdd = new ArrayList<>();
+        DailyGamesScreenshotScoreDTO dailyGamesScore = new DailyGamesScreenshotScoreDTO();
+        dailyGamesScore.setDailyGamesScore(scoresToAdd);
+
+        ResponseEntity<Boolean> response = dailyGamesController.isDailyGameScreenshotScoreOk(dailyGamesScore);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody());
+        verify(dailyGamesScreenshotsService, times(1)).addScore(scoresToAdd);
+    }
+
+    @Test
+    void getScreenshotScoresReturnsEmptyListWhenNoScores() {
+        List<Integer> expectedScores = new ArrayList<>();
+        when(dailyGamesScreenshotsService.getScore()).thenReturn(expectedScores);
+
+        ResponseEntity<List<Integer>> response = dailyGamesController.getDailyGamesScreenshotScore();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody().isEmpty());
+    }
+
+    @Test
+    void addingScoreUpdatesDailyGameScoreSuccessfully() {
+        Integer scoreToAdd = 10;
+
+        ResponseEntity<Boolean> response = dailyGamesController.isDailyGameScoreOk(scoreToAdd);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody());
+    }
+
+    @Test
+    void addingScoreUpdatesDailyGameScoreFails() {
+        int scoreToAdd = 10;
+
+        doThrow(new RuntimeException("No daily games found")).when(dailyGameService).addScore(scoreToAdd);
+
+        assertThrows(RuntimeException.class, () -> dailyGamesController.isDailyGameScoreOk(scoreToAdd));
+    }
+
+    @Test
+    void getDailyGameScoreReturnsCorrectScore() {
+        Integer expectedScore = 42;
+        when(dailyGameService.getScore()).thenReturn(expectedScore);
+
+        ResponseEntity<Integer> response = dailyGamesController.getDailyGameScore();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedScore, response.getBody());
     }
 }

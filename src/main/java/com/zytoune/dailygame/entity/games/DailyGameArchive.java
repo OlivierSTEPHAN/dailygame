@@ -7,21 +7,15 @@ import java.util.List;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Entity
-@Table(name = "t_daily_games_screenshot")
-public class DailyGamesScreenshot {
-   
+@Table(name = "t_daily_game_archive")
+public class DailyGameArchive {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String name;
-    private List<String> alternativeNames;
-    private String screenshot;
-    private List<String> franchises;
     private List<Integer> scores;
-
 }

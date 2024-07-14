@@ -2,9 +2,11 @@ package com.zytoune.dailygame.service;
 
 import com.zytoune.dailygame.dto.DailyGamesScreenshotsUrlDTO;
 import com.zytoune.dailygame.dto.DailyGamesScreenshotsDTO;
+import com.zytoune.dailygame.entity.games.DailyGameScreenshotArchive;
 import com.zytoune.dailygame.entity.games.DailyGamesScreenshot;
 import com.zytoune.dailygame.entity.games.Games;
 import com.zytoune.dailygame.model.ImageType;
+import com.zytoune.dailygame.repository.games.DailyGameScreenshotArchiveRepository;
 import com.zytoune.dailygame.repository.games.DailyGamesScreenshotsRepository;
 import com.zytoune.dailygame.util.GameComparaturUtil;
 import io.micrometer.common.util.StringUtils;
@@ -13,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Random;
 
@@ -22,6 +26,7 @@ import java.util.Random;
 public class DailyGamesScreenshotService {
 
     private DailyGamesScreenshotsRepository dailyGamesScreenshotsRepository;
+    private DailyGameScreenshotArchiveRepository dailyGameScreenshotArchiveRepository;
     private GamesService gamesService;
     private ScreenshotsService screenshotsService;
     private AlternativeNamesService alternativeNamesService;
@@ -90,8 +95,25 @@ public class DailyGamesScreenshotService {
             log.info("No games yet");
             return;
         }
+        if(this.dailyGamesScreenshotsRepository.count() > 0){
 
-        this.dailyGamesScreenshotsRepository.deleteAll();
+            List<DailyGamesScreenshot> dailyGamesScreenshotList = this.dailyGamesScreenshotsRepository.findAll();
+
+            int currentDate = Integer.parseInt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyy")));
+
+            for(DailyGamesScreenshot dailyGamesScreenshot : dailyGamesScreenshotList){
+                DailyGameScreenshotArchive dailyGameScreenshotArchive = DailyGameScreenshotArchive.builder()
+                        .date(currentDate)
+                        .name(dailyGamesScreenshot.getName())
+                        .screenshot(dailyGamesScreenshot.getScreenshot())
+                        .scores(dailyGamesScreenshot.getScores())
+                        .build();
+                this.dailyGameScreenshotArchiveRepository.save(dailyGameScreenshotArchive);
+            }
+
+            this.dailyGamesScreenshotsRepository.deleteAll();
+        }
+
         for (int i = 0; i < 10; i++) {
             Games game = this.gamesService.findNRandomGames(1, 75).get(0);
             log.info("Game {} : {}", i, game.getName() + " " + game.getScreenshots());
@@ -114,4 +136,35 @@ public class DailyGamesScreenshotService {
         }
     }
 
+
+    public void addScore(List<Integer> dailyGamesScore) {
+        List<DailyGamesScreenshot> dailyGameScreenshots = dailyGamesScreenshotsRepository.findAll();
+        if(dailyGameScreenshots.isEmpty()){
+            throw new RuntimeException("No daily games found");
+        }
+
+        if(dailyGameScreenshots.size() != dailyGamesScore.size()){
+            throw new RuntimeException("Daily games and scores length don't match, no score will be added");
+        }
+
+        for(int i = 0; i < dailyGamesScore.size(); i++){
+            DailyGamesScreenshot dailyGame = dailyGameScreenshots.get(i);
+            dailyGame.getScores().add(dailyGamesScore.get(i));
+            dailyGamesScreenshotsRepository.save(dailyGame);
+        }
+    }
+
+    public List<Integer> getScore() {
+        List<DailyGamesScreenshot> dailyGameScreenshots = dailyGamesScreenshotsRepository.findAll();
+        if(dailyGameScreenshots.isEmpty()){
+            throw new RuntimeException("No daily games found");
+        }
+
+        // for every daily game, get the average score, and return the list of all average scores, if no score, return 0
+        if (dailyGameScreenshots.stream().allMatch(dailyGame -> dailyGame.getScores().isEmpty())) {
+            return dailyGameScreenshots.stream().map(dailyGame -> 0).toList();
+        }
+
+        return dailyGameScreenshots.stream().map(dailyGame -> dailyGame.getScores().stream().mapToInt(Integer::intValue).sum() / dailyGame.getScores().size()).toList();
+    }
 }

@@ -29,4 +29,5 @@ public class DailyGame {
     private List<String> gameModes;
     private List<String> gameEngines;
     private Timestamp creation;
+    private List<Integer> scores;
 }
