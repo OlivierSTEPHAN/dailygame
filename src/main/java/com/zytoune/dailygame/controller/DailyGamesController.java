@@ -61,7 +61,7 @@ public class DailyGamesController {
     }
 
     @PostMapping("/characteristics/score")
-    public ResponseEntity<Boolean> isDailyGameScoreOk(@RequestBody Integer dailyGameScore) {
+    public ResponseEntity<Boolean> isDailyGameScoreOk(@RequestParam Integer dailyGameScore) {
         log.info("Daily games score {}", dailyGameScore);
         dailyGameService.addScore(dailyGameScore);
         return ResponseEntity.ok(true);

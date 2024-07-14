@@ -19,7 +19,5 @@ public class DailyGameScreenshotArchive {
     private int date;
     private String name;
     private String screenshot;
-
-    @ElementCollection
     private List<Integer> scores;
 }
