@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -29,5 +30,7 @@ public class DailyGame {
     private List<String> gameModes;
     private List<String> gameEngines;
     private Timestamp creation;
-    private List<Integer> scores;
+
+    @Builder.Default
+    private List<Integer> scores = new ArrayList<>();
 }

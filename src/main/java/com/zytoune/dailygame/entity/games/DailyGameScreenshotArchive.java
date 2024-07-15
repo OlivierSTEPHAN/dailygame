@@ -3,6 +3,7 @@ package com.zytoune.dailygame.entity.games;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -19,5 +20,7 @@ public class DailyGameScreenshotArchive {
     private int date;
     private String name;
     private String screenshot;
-    private List<Integer> scores;
+
+    @Builder.Default
+    private List<Integer> scores = new ArrayList<>();
 }

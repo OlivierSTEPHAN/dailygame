@@ -17,6 +17,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -45,16 +47,20 @@ public class DailyGamesScreenshotService {
 
 
     public DailyGamesScreenshotsDTO getDailyGames() {
-        List<DailyGamesScreenshot> dailyGameScreenshots = dailyGamesScreenshotsRepository.findAll();
-        if(dailyGameScreenshots.isEmpty()){
+        List<DailyGamesScreenshot> dailyGameScreenshots = new ArrayList<>(dailyGamesScreenshotsRepository.findAll());
+        if (dailyGameScreenshots.isEmpty()) {
             throw new RuntimeException("No daily games found");
         }
+
+        // Sort by id
+        dailyGameScreenshots.sort(Comparator.comparingInt(DailyGamesScreenshot::getId));
 
         return DailyGamesScreenshotsDTO.builder()
                 .name(dailyGameScreenshots.stream().map(DailyGamesScreenshot::getName).toList())
                 .url(dailyGameScreenshots.stream().map(DailyGamesScreenshot::getScreenshot).toList())
                 .build();
     }
+
 
     public Boolean checkDailyGame(int index, String answer) {
 

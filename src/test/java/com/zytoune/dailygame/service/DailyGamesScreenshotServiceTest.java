@@ -49,16 +49,17 @@ class DailyGamesScreenshotServiceTest {
     }
 
     @Test
-    void getDailyGamesReturnsCorrectDataWhenGamesExist() {
+    void getDailyGamesReturnsCorrectSortedDataWhenGamesExist() {
         List<DailyGamesScreenshot> mockDailyGamesScreenshots = List.of(
-                new DailyGamesScreenshot(1, "Game 1", List.of("AltName1"), "url1", List.of("Franchise1"), new ArrayList<>()),
-                new DailyGamesScreenshot(2, "Game 2", List.of("AltName2"), "url2", List.of("Franchise2"), new ArrayList<>())
+                new DailyGamesScreenshot(2, "Game 2", List.of("AltName2"), "url2", List.of("Franchise2"), new ArrayList<>()),
+                new DailyGamesScreenshot(1, "Game 1", List.of("AltName1"), "url1", List.of("Franchise1"), new ArrayList<>())
         );
         when(dailyGamesScreenshotsRepository.findAll()).thenReturn(mockDailyGamesScreenshots);
 
         DailyGamesScreenshotsDTO result = dailyGamesScreenshotService.getDailyGames();
 
         assertEquals(2, result.getName().size());
+        assertEquals(result.getName().get(0), "Game 1");
         assertTrue(result.getName().contains("Game 1"));
         assertTrue(result.getUrl().contains("url1"));
         assertTrue(result.getName().contains("Game 2"));
