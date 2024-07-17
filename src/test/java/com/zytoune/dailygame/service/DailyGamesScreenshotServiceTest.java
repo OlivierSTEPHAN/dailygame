@@ -51,10 +51,10 @@ class DailyGamesScreenshotServiceTest {
     @Test
     void getDailyGamesReturnsCorrectSortedDataWhenGamesExist() {
         List<DailyGamesScreenshot> mockDailyGamesScreenshots = List.of(
-                new DailyGamesScreenshot(2, "Game 2", List.of("AltName2"), "url2", List.of("Franchise2"), new ArrayList<>()),
-                new DailyGamesScreenshot(1, "Game 1", List.of("AltName1"), "url1", List.of("Franchise1"), new ArrayList<>())
+                new DailyGamesScreenshot(1, "Game 1", List.of("AltName1"), "url1", List.of("Franchise1"), new ArrayList<>()),
+                new DailyGamesScreenshot(2, "Game 2", List.of("AltName2"), "url2", List.of("Franchise2"), new ArrayList<>())
         );
-        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(mockDailyGamesScreenshots);
+        when(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc()).thenReturn(mockDailyGamesScreenshots);
 
         DailyGamesScreenshotsDTO result = dailyGamesScreenshotService.getDailyGames();
 
@@ -68,7 +68,7 @@ class DailyGamesScreenshotServiceTest {
 
     @Test
     void getDailyGamesThrowsExceptionWhenNoGamesFound() {
-        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(List.of());
+        when(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc()).thenReturn(List.of());
 
         assertThrows(RuntimeException.class, () -> dailyGamesScreenshotService.getDailyGames());
     }
@@ -76,7 +76,7 @@ class DailyGamesScreenshotServiceTest {
     @Test
     void shouldReturnDailyGamesWhenExist() {
         List<DailyGamesScreenshot> dailyGamesScreenshots = Arrays.asList(new DailyGamesScreenshot(), new DailyGamesScreenshot());
-        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(dailyGamesScreenshots);
+        when(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc()).thenReturn(dailyGamesScreenshots);
 
         DailyGamesScreenshotsUrlDTO result = dailyGamesScreenshotService.getDailyGamesUrl();
 
@@ -85,7 +85,7 @@ class DailyGamesScreenshotServiceTest {
 
     @Test
     void shouldThrowExceptionWhenNoDailyGames() {
-        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(List.of());
+        when(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc()).thenReturn(List.of());
 
         assertThrows(RuntimeException.class, () -> dailyGamesScreenshotService.getDailyGamesUrl());
     }
@@ -101,7 +101,7 @@ class DailyGamesScreenshotServiceTest {
         dailyGamesScreenshot2.setAlternativeNames(List.of("alternative name again"));
 
         List<DailyGamesScreenshot> dailyGamesScreenshots = Arrays.asList(dailyGamesScreenshot1, dailyGamesScreenshot2);
-        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(dailyGamesScreenshots);
+        when(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc()).thenReturn(dailyGamesScreenshots);
 
         Boolean result = dailyGamesScreenshotService.checkDailyGame(0, "Pokémon Legends: Arceus");
 
@@ -119,7 +119,7 @@ class DailyGamesScreenshotServiceTest {
         dailyGamesScreenshot2.setAlternativeNames(List.of("alternative name again"));
 
         List<DailyGamesScreenshot> dailyGamesScreenshots = Arrays.asList(dailyGamesScreenshot1, dailyGamesScreenshot2);
-        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(dailyGamesScreenshots);
+        when(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc()).thenReturn(dailyGamesScreenshots);
 
         Boolean result = dailyGamesScreenshotService.checkDailyGame(0, "FIFA Soccer 08");
 
@@ -136,7 +136,7 @@ class DailyGamesScreenshotServiceTest {
         dailyGamesScreenshot2.setAlternativeNames(List.of("wrong answer"));
 
         List<DailyGamesScreenshot> dailyGamesScreenshots = Arrays.asList(dailyGamesScreenshot1, dailyGamesScreenshot2);
-        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(dailyGamesScreenshots);
+        when(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc()).thenReturn(dailyGamesScreenshots);
 
         Boolean result = dailyGamesScreenshotService.checkDailyGame(0, "correct answer");
 
@@ -151,7 +151,7 @@ class DailyGamesScreenshotServiceTest {
         dailyGamesScreenshot1.setFranchises(List.of());
 
         List<DailyGamesScreenshot> dailyGamesScreenshots = List.of(dailyGamesScreenshot1);
-        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(dailyGamesScreenshots);
+        when(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc()).thenReturn(dailyGamesScreenshots);
 
         Boolean result = dailyGamesScreenshotService.checkDailyGame(0, "Fallout: Brotherhood of Steel 2");
 
@@ -169,7 +169,7 @@ class DailyGamesScreenshotServiceTest {
         dailyGamesScreenshot1.setAlternativeNames(List.of("different alternative name"));
         dailyGamesScreenshot1.setFranchises(List.of());
         List<DailyGamesScreenshot> dailyGamesScreenshots = Arrays.asList(dailyGamesScreenshot1, dailyGamesScreenshot2);
-        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(dailyGamesScreenshots);
+        when(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc()).thenReturn(dailyGamesScreenshots);
 
         Boolean result = dailyGamesScreenshotService.checkDailyGame(0, "wrong answer");
 
@@ -187,7 +187,7 @@ class DailyGamesScreenshotServiceTest {
         dailyGamesScreenshot1.setAlternativeNames(List.of("different alternative name"));
         dailyGamesScreenshot1.setFranchises(List.of(""));
         List<DailyGamesScreenshot> dailyGamesScreenshots = Arrays.asList(dailyGamesScreenshot1, dailyGamesScreenshot2);
-        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(dailyGamesScreenshots);
+        when(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc()).thenReturn(dailyGamesScreenshots);
 
         Boolean result = dailyGamesScreenshotService.checkDailyGame(0, "");
 
@@ -196,7 +196,7 @@ class DailyGamesScreenshotServiceTest {
 
     @Test
     void shouldThrowExceptionWhenNoDailyGamesToCheck() {
-        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(List.of());
+        when(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc()).thenReturn(List.of());
 
         assertThrows(RuntimeException.class, () -> dailyGamesScreenshotService.checkDailyGame(0, "any answer"));
     }
@@ -267,7 +267,7 @@ class DailyGamesScreenshotServiceTest {
                 new DailyGamesScreenshot(1, "Game 1", List.of("AltName1"), "url1", List.of("Franchise1"), new ArrayList<>(List.of(10))),
                 new DailyGamesScreenshot(2, "Game 2", List.of("AltName2"), "url2", List.of("Franchise2"), new ArrayList<>(List.of(20)))
         );
-        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(mockDailyGamesScreenshots);
+        when(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc()).thenReturn(mockDailyGamesScreenshots);
 
         dailyGamesScreenshotService.addScore(List.of(30, 40));
 
@@ -281,7 +281,7 @@ class DailyGamesScreenshotServiceTest {
     @Test
     void addingScoreFailsWhenScoresListSizeDoesNotMatchDailyGamesSize() {
         List<DailyGamesScreenshot> mockDailyGamesScreenshots = List.of(new DailyGamesScreenshot());
-        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(mockDailyGamesScreenshots);
+        when(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc()).thenReturn(mockDailyGamesScreenshots);
 
         Exception exception = assertThrows(RuntimeException.class, () -> dailyGamesScreenshotService.addScore(List.of(10, 20)));
 
@@ -290,7 +290,7 @@ class DailyGamesScreenshotServiceTest {
 
     @Test
     void addingScoreFailsWhenNoDailyGamesFound() {
-        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(List.of());
+        when(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc()).thenReturn(List.of());
 
         Exception exception = assertThrows(RuntimeException.class, () -> dailyGamesScreenshotService.addScore(List.of(10)));
 
@@ -303,7 +303,7 @@ class DailyGamesScreenshotServiceTest {
                 new DailyGamesScreenshot(1 ,"Game 1", List.of("AltName1"), "url1", List.of("Franchise1"), new ArrayList<>(List.of(10, 20))),
                 new DailyGamesScreenshot(2, "Game 2", List.of("AltName2"), "url2", List.of("Franchise2"), new ArrayList<>(List.of(30, 40, 50)))
         );
-        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(mockDailyGamesScreenshots);
+        when(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc()).thenReturn(mockDailyGamesScreenshots);
 
         List<Integer> scores = dailyGamesScreenshotService.getScore();
 
@@ -316,7 +316,7 @@ class DailyGamesScreenshotServiceTest {
                 new DailyGamesScreenshot(1, "Game 1", new ArrayList<>(), "url1", List.of("AltName1"), List.of()),
                 new DailyGamesScreenshot(2, "Game 2", new ArrayList<>(), "url2", List.of("AltName2"), List.of())
         );
-        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(mockDailyGamesScreenshots);
+        when(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc()).thenReturn(mockDailyGamesScreenshots);
 
         List<Integer> scores = dailyGamesScreenshotService.getScore();
 
@@ -325,7 +325,7 @@ class DailyGamesScreenshotServiceTest {
 
     @Test
     void getScoreFailsWhenNoDailyGamesFound() {
-        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(List.of());
+        when(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc()).thenReturn(List.of());
 
         Exception exception = assertThrows(RuntimeException.class, () -> dailyGamesScreenshotService.getScore());
 
@@ -339,7 +339,7 @@ class DailyGamesScreenshotServiceTest {
 
         dailyGamesScreenshotService.updateDailyGames();
 
-        verify(dailyGamesScreenshotsRepository, never()).findAll();
+        verify(dailyGamesScreenshotsRepository, never()).findAllByOrderByIdAsc();
         verify(dailyGameScreenshotArchiveRepository, never()).save(any(DailyGameScreenshotArchive.class));
         verify(dailyGamesScreenshotsRepository, never()).deleteAll();
     }
@@ -355,7 +355,7 @@ class DailyGamesScreenshotServiceTest {
         when(screenshotsService.count()).thenReturn(1L);
         when(dailyGamesScreenshotsRepository.count()).thenReturn(1L);
         List<DailyGamesScreenshot> existingScreenshots = List.of(new DailyGamesScreenshot());
-        when(dailyGamesScreenshotsRepository.findAll()).thenReturn(existingScreenshots);
+        when(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc()).thenReturn(existingScreenshots);
 
         dailyGamesScreenshotService.updateDailyGames();
 

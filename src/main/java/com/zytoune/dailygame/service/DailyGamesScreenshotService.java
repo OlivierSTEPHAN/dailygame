@@ -18,7 +18,6 @@ import org.springframework.util.CollectionUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -35,7 +34,7 @@ public class DailyGamesScreenshotService {
     private FranchisesService franchisesService;
 
     public DailyGamesScreenshotsUrlDTO getDailyGamesUrl() {
-        List<DailyGamesScreenshot> dailyGameScreenshots = dailyGamesScreenshotsRepository.findAll();
+        List<DailyGamesScreenshot> dailyGameScreenshots = dailyGamesScreenshotsRepository.findAllByOrderByIdAsc();
         if(dailyGameScreenshots.isEmpty()){
             throw new RuntimeException("No daily games found");
         }
@@ -47,13 +46,10 @@ public class DailyGamesScreenshotService {
 
 
     public DailyGamesScreenshotsDTO getDailyGames() {
-        List<DailyGamesScreenshot> dailyGameScreenshots = new ArrayList<>(dailyGamesScreenshotsRepository.findAll());
+        List<DailyGamesScreenshot> dailyGameScreenshots = new ArrayList<>(dailyGamesScreenshotsRepository.findAllByOrderByIdAsc());
         if (dailyGameScreenshots.isEmpty()) {
             throw new RuntimeException("No daily games found");
         }
-
-        // Sort by id
-        dailyGameScreenshots.sort(Comparator.comparingInt(DailyGamesScreenshot::getId));
 
         return DailyGamesScreenshotsDTO.builder()
                 .name(dailyGameScreenshots.stream().map(DailyGamesScreenshot::getName).toList())
@@ -64,7 +60,7 @@ public class DailyGamesScreenshotService {
 
     public Boolean checkDailyGame(int index, String answer) {
 
-        List<DailyGamesScreenshot> dailyGameScreenshots = dailyGamesScreenshotsRepository.findAll();
+        List<DailyGamesScreenshot> dailyGameScreenshots = dailyGamesScreenshotsRepository.findAllByOrderByIdAsc();
 
         if(dailyGameScreenshots.isEmpty()){
             throw new RuntimeException("No daily games found");
@@ -103,7 +99,7 @@ public class DailyGamesScreenshotService {
         }
         if(this.dailyGamesScreenshotsRepository.count() > 0){
 
-            List<DailyGamesScreenshot> dailyGamesScreenshotList = this.dailyGamesScreenshotsRepository.findAll();
+            List<DailyGamesScreenshot> dailyGamesScreenshotList = this.dailyGamesScreenshotsRepository.findAllByOrderByIdAsc();
 
             int currentDate = Integer.parseInt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyy")));
 
@@ -144,7 +140,7 @@ public class DailyGamesScreenshotService {
 
 
     public void addScore(List<Integer> dailyGamesScore) {
-        List<DailyGamesScreenshot> dailyGameScreenshots = dailyGamesScreenshotsRepository.findAll();
+        List<DailyGamesScreenshot> dailyGameScreenshots = dailyGamesScreenshotsRepository.findAllByOrderByIdAsc();
         if(dailyGameScreenshots.isEmpty()){
             throw new RuntimeException("No daily games found");
         }
@@ -161,7 +157,7 @@ public class DailyGamesScreenshotService {
     }
 
     public List<Integer> getScore() {
-        List<DailyGamesScreenshot> dailyGameScreenshots = dailyGamesScreenshotsRepository.findAll();
+        List<DailyGamesScreenshot> dailyGameScreenshots = dailyGamesScreenshotsRepository.findAllByOrderByIdAsc();
         if(dailyGameScreenshots.isEmpty()){
             throw new RuntimeException("No daily games found");
         }
