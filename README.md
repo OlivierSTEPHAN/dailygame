@@ -70,6 +70,14 @@ docker-compose --env-file .env.dev up --build -d
 docker service update --image zytoune29/dailygames:latest dailygame_app
 ``
 
+## Stop, remove and update the app without stoping other container
+``
+docker-compose stop app
+docker-compose rm -f app
+docker pull zytoune29/dailygames:latest
+docker-compose --env-file .env.prod up --no-deps --build -d app
+``
+
 ## Checking Logs
 
 To check the logs of the running containers, use the following command:
